@@ -1,0 +1,19 @@
+html {
+  background-color: #000;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+}
+
+svg {
+  border-style: solid;
+  border-width: 1px;
+}
+
+button {
+  background-color: black;
+  border-width: 1px;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  text-align: left;
+}
