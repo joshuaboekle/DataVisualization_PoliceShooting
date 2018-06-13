@@ -6,15 +6,17 @@ var paperHeight = parseInt(document.getElementById("svgContainer").getAttribute(
 init();
 
 function init() {
-  console.log(data);
-  //victimsPerState();
-  drawFifaViz();
+  draw();
+}
+
+function draw() {
+drawFifaViz();
 
 }
 
 function drawFifaViz() {
 
-  var armingCounted = [20,30,14,30,10];
+  var armingCounted = [20,32,14,18,10];
 
   // empty array to push new position coords for the polygon
   var positions = [];
@@ -36,7 +38,7 @@ function drawFifaViz() {
     positions.push(Math.round(xPos),Math.round(yPos));
 
     paper.ellipse(indicatorX,indicatorY,2,2).attr({
-      fill: "white"
+      fill: "black"
     });
   }
   paper.polygon([positions[0],positions[1],
@@ -44,47 +46,6 @@ function drawFifaViz() {
               positions[4],positions[5],
               positions[6],positions[7],
               positions[8],positions[9]]).attr({
-  fill: "white"
+  fill: "black"
 });
-}
-
-function victimsPerState() {
-  for (var i = 0; i < 51; i++) {
-
-    var xPos = (i * paperWidth / 51);
-    var yPos = paperHeight / 2;
-    var age = data[i].age
-
-    paper.rect(xPos, yPos, 2, age).attr({
-      fill: 'white'
-    });
-  }
-
-  var mergedData = {};
-  for (var i = 0; i < data.length; i++) {
-    var newData = data[i];
-
-    var merged = mergedData[newData.state];
-    if (!merged) {
-      merged = [];
-      mergedData[newData.state] = merged;
-    }
-    merged.push(newData.state);
-  }
-  console.log(mergedData);
-
-
-  // counter but just for array no objects
-  //
-  // var array1 = ['a', 'b', 'c', 'a', 'b', 'c', 'a'];
-  // counter = {}
-  // array1.forEach(function(obj) {
-  //   var key = JSON.stringify(obj)
-  //   counter[key] = (counter[key] || 0) + 1
-  // })
-  // console.log(counter);
-}
-
-function deleteCanvas() {
-  paper.selectAll("circle,rect,text").remove();
 }
