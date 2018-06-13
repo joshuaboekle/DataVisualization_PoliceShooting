@@ -6,15 +6,53 @@ var paperHeight = parseInt(document.getElementById("svgContainer").getAttribute(
 init();
 
 function init() {
-  console.log(data);
+  var testArray = [0,20,30,10,15,25];
+  //console.log(data);
   //victimsPerState();
-  drawFifaViz();
+  //drawFifaViz();
+  drawEthnicity(testArray);
+}
+
+function drawEthnicity(array){
+  var raceCounted = array;
+
+
+  for (var i = 0; i < raceCounted.length; i++) {
+
+    var reducer = (accumulator, currentValue) => accumulator + currentValue;
+    var sumArray = raceCounted.reduce(reducer);
+    console.log(raceCounted[i],"von",sumArray);
+
+    var angle = map(raceCounted[i],0,sumArray,0,360);
+    console.log("Grad:",angle);
+
+    angle = radians(angle);
+    console.log("Bogenmaß:",angle);
+
+  }
+
+  var radius = 100;
+  var centerX = paperWidth/2;
+  var centerY = paperHeight/2;
+
+  var startX =  Math.cos(0) * radius + centerX;
+  var startY =  Math.sin(0) * radius + centerY;
+
+  var endX = Math.cos(angle) * radius + centerX;
+  var endY =  Math.sin(angle) * radius + centerY;
+
+  paper.path("M"+startX+"," +startY+ "A" +radius+ ","+radius+ " 0 0 1 "+endX+ ","+endY+"").attr({
+    stroke:"white",
+    strokeWidth: 10
+  })
+
 
 }
 
+
 function drawFifaViz() {
 
-  var armingCounted = [20,30,14,30,10];
+  var armingCounted = [20,30,22,17,16];
 
   // empty array to push new position coords for the polygon
   var positions = [];

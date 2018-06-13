@@ -1,0 +1,5 @@
+
+Kreisbogen auf Kreis
+
+https://stackoverflow.com/questions/40200353/snap-svg-inner-shadow-on-animated-arc
+
