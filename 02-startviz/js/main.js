@@ -9,12 +9,13 @@ var cy = paperHeight / 2;
 init();
 
 function init() {
+  var testArray = [10, 20, 15, 5, 30];
 
-  var testArray = [200, 10, 15, 20, 5];
   //console.log(data);
-  // victimsPerState();
-  //drawFifaViz(testArray);
-  drawEthnicity(testArray);
+  //victimsPerState();
+  // drawFifaViz(testArray);
+  // drawEthnicity(testArray);
+  drawSmartDonut(testArray);
   //drawEthnicity2(testArray);
 
 }
@@ -49,6 +50,66 @@ function drawEthnicity2(array) {
 
 };
 
+function drawSmartDonut(array) {
+
+  var raceCounted = array;
+
+
+  var radiusVizualization = 100;
+  var offsetX = paperWidth / 2;
+  var offsetY = paperHeight / 2;
+
+  var radiants = [];
+
+  var reducer = (accumulator, currentValue) => accumulator + currentValue;
+  var sumArray = raceCounted.reduce(reducer);
+
+  for (var i = 0; i < raceCounted.length; i++) {
+    var angle = map(raceCounted[i], 0, sumArray, 0, 360);
+    rad = radians(angle);
+
+    radiants.push(rad);
+  }
+
+  var positions = [];
+  var currentPosition = 0; // for the following loop
+
+  for (var i = 0; i < radiants.length; i++) {
+    positions.push([]);
+    var start = currentPosition;
+    var end = currentPosition + radiants[i];
+
+    positions[i].push(start);
+    positions[i].push(end);
+    currentPosition += radiants[i];
+  }
+
+  for (var i = 0; i < radiants.length; i++) {
+    for (var j = 0; j < positions[i].length; j++) {
+      var radianArcStart = positions[i][0];
+      var radianArcEnd = positions[i][1];
+
+      var above180 = 0;
+      if (radiants[i] > radians(180)) {
+        above180 = 1;
+      }
+
+      var startX = Math.sin(radianArcStart) * radiusVizualization + offsetX;
+      var startY = -Math.cos(radianArcStart) * radiusVizualization + offsetY;
+
+      var endX = Math.sin(radianArcEnd) * radiusVizualization + offsetX;
+      var endY = -Math.cos(radianArcEnd) * radiusVizualization + offsetY;
+
+      paper.path("M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
+        stroke: getColor(i * 20),
+        strokeWidth: 15,
+        fill: "none"
+      })
+    }
+  }
+}
+
+
 function drawEthnicity(array) {
   var raceCounted = array;
   var angles = [];
@@ -57,10 +118,10 @@ function drawEthnicity(array) {
 
     var reducer = (accumulator, currentValue) => accumulator + currentValue;
     var sumArray = raceCounted.reduce(reducer);
-    console.log(raceCounted[i], "von", sumArray);
+    //  console.log(raceCounted[i], "von", sumArray);
 
     var angle = map(raceCounted[i], 0, sumArray, 0, 360);
-    console.log("Grad:", angle);
+    //  console.log("Grad:", angle);
 
     //angle = radians(angle);
     //console.log("Bogenmaß:", angle);
@@ -105,32 +166,32 @@ function drawEthnicity(array) {
   var endX5 = Math.sin(radian5) * radius + centerX;
   var endY5 = -Math.cos(radian5) * radius + centerY;
 
-  var above180 = 0
+  var above180 = 0;
   if (radian1 > radians(180)) {
-    above180 = 1
+    above180 = 0;
   }
   paper.path("M" + startX + "," + startY + "A" + radius + "," + radius + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
-    stroke: "yellow",
+    stroke: getColor(20),
     strokeWidth: 15
   })
 
   paper.path("M" + endX + "," + endY + "A" + radius + "," + radius + " 0 0 1 " + endX2 + "," + endY2 + "").attr({
-    stroke: "green",
+    stroke: getColor(40),
     strokeWidth: 15
   })
 
   paper.path("M" + endX2 + "," + endY2 + "A" + radius + "," + radius + " 0 0 1 " + endX3 + "," + endY3 + "").attr({
-    stroke: "pink",
+    stroke: getColor(60),
     strokeWidth: 15
   })
 
   paper.path("M" + endX3 + "," + endY3 + "A" + radius + "," + radius + " 0 0 1 " + endX4 + "," + endY4 + "").attr({
-    stroke: "blue",
+    stroke: getColor(80),
     strokeWidth: 15
   })
 
   paper.path("M" + endX4 + "," + endY4 + "A" + radius + "," + radius + " 0 0 1 " + endX5 + "," + endY5 + "").attr({
-    stroke: "red",
+    stroke: getColor(100),
     strokeWidth: 15
   })
 }
@@ -212,6 +273,11 @@ function victimsPerState() {
 
 
 //helper functions
+function getColor(inputVal) {
+  var func = chroma.scale(["#fff", "#444"]).domain([0, 100]);
+  return func(inputVal);
+}
+
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
   var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
 
