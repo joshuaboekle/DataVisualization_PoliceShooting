@@ -10,12 +10,12 @@ init();
 
 function init() {
 
-  var testArray = [20, 30, 10, 15, 25];
+  var testArray = [200, 10, 15, 20, 5];
   //console.log(data);
   // victimsPerState();
   //drawFifaViz(testArray);
-  //drawEthnicity(testArray);
-  drawEthnicity2(testArray);
+  drawEthnicity(testArray);
+  //drawEthnicity2(testArray);
 
 }
 
@@ -32,19 +32,20 @@ function drawEthnicity2(array) {
     var sumArray = raceCounted.reduce(reducer);
     console.log(raceCounted[i], "von", sumArray);
 
-    var angle = map(raceCounted[i], 0, sumArray, 0, 360) * 2;
+    var angle = map(raceCounted[i], 0, sumArray, 0, 360);
     console.log("Grad:", angle);
 
     angles.push(angle);
   }
   console.log(angles);
   var spacing = 3;
+  console.log(angles[0] + spacing)
 
-  document.getElementById("arc1").setAttribute("d", describeArc(cx, cy, radius, 0, angles[0]));
+  document.getElementById("arc1").setAttribute("d", describeArc(cx, cy, radius, 0 + spacing, angles[0]));
   document.getElementById("arc2").setAttribute("d", describeArc(cx, cy, radius, angles[0], angles[0] + angles[1]));
-  document.getElementById("arc3").setAttribute("d", describeArc(cx, cy, radius, angles[1], angles[1] + angles[2]));
-  document.getElementById("arc4").setAttribute("d", describeArc(cx, cy, radius, angles[2], angles[2] + angles[3]));
-  document.getElementById("arc5").setAttribute("d", describeArc(cx, cy, radius, angles[3], angles[3] + angles[4]));
+  document.getElementById("arc3").setAttribute("d", describeArc(cx, cy, radius, angles[0] + angles[1], angles[0] + angles[1] + angles[2]));
+  document.getElementById("arc4").setAttribute("d", describeArc(cx, cy, radius, angles[0] + angles[1] + angles[2], angles[0] + angles[1] + angles[2] + angles[3]));
+  document.getElementById("arc5").setAttribute("d", describeArc(cx, cy, radius, angles[0] + angles[1] + angles[2] + angles[3], angles[0] + angles[1] + angles[2] + angles[3] + angles[4]));
 
 };
 
@@ -66,14 +67,21 @@ function drawEthnicity(array) {
 
     angles.push(angle);
   }
+
+
   console.log(angles);
-  var angle1 = 90;
-  var angle2 = 45;
-  var angle3 = 160;
+  var angle1 = angles[0];
+  var angle2 = angles[1];
+  var angle3 = angles[2];
+  var angle4 = angles[3];
+  var angle5 = angles[4];
+
 
   var radian1 = radians(angle1);
   var radian2 = radians(angle1 + angle2);
-  var radian3 = radians(angle1 + angle2 + angle3)
+  var radian3 = radians(angle1 + angle2 + angle3);
+  var radian4 = radians(angle1 + angle2 + angle3 + angle4);
+  var radian5 = radians(angle1 + angle2 + angle3 + angle4 + angle5);
 
   var radius = 100;
   var centerX = paperWidth / 2;
@@ -91,22 +99,40 @@ function drawEthnicity(array) {
   var endX3 = Math.sin(radian3) * radius + centerX;
   var endY3 = -Math.cos(radian3) * radius + centerY;
 
-  paper.path("M" + startX + "," + startY + "A" + radius + "," + radius + " 0 0 1 " + endX + "," + endY + "").attr({
+  var endX4 = Math.sin(radian4) * radius + centerX;
+  var endY4 = -Math.cos(radian4) * radius + centerY;
+
+  var endX5 = Math.sin(radian5) * radius + centerX;
+  var endY5 = -Math.cos(radian5) * radius + centerY;
+
+  var above180 = 0
+  if (radian1 > radians(180)) {
+    above180 = 1
+  }
+  paper.path("M" + startX + "," + startY + "A" + radius + "," + radius + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
     stroke: "yellow",
-    strokeWidth: 10
+    strokeWidth: 15
   })
 
   paper.path("M" + endX + "," + endY + "A" + radius + "," + radius + " 0 0 1 " + endX2 + "," + endY2 + "").attr({
     stroke: "green",
-    strokeWidth: 10
+    strokeWidth: 15
   })
 
   paper.path("M" + endX2 + "," + endY2 + "A" + radius + "," + radius + " 0 0 1 " + endX3 + "," + endY3 + "").attr({
     stroke: "pink",
-    strokeWidth: 10
+    strokeWidth: 15
   })
 
+  paper.path("M" + endX3 + "," + endY3 + "A" + radius + "," + radius + " 0 0 1 " + endX4 + "," + endY4 + "").attr({
+    stroke: "blue",
+    strokeWidth: 15
+  })
 
+  paper.path("M" + endX4 + "," + endY4 + "A" + radius + "," + radius + " 0 0 1 " + endX5 + "," + endY5 + "").attr({
+    stroke: "red",
+    strokeWidth: 15
+  })
 }
 
 function drawFifaViz(array) {
