@@ -6,91 +6,100 @@ var paperHeight = parseInt(document.getElementById("svgContainer").getAttribute(
 init();
 
 function init() {
-  var testArray = [0,20,30,10,15,25];
+  var testArray = [20, 30, 10, 15, 25];
   //console.log(data);
   //victimsPerState();
-  //drawFifaViz();
-  drawEthnicity(testArray);
+  drawFifaViz(testArray);
+  //drawEthnicity(testArray);
 }
 
-function drawEthnicity(array){
+function drawEthnicity(array) {
   var raceCounted = array;
-
 
   for (var i = 0; i < raceCounted.length; i++) {
 
     var reducer = (accumulator, currentValue) => accumulator + currentValue;
     var sumArray = raceCounted.reduce(reducer);
-    console.log(raceCounted[i],"von",sumArray);
+    console.log(raceCounted[i], "von", sumArray);
 
-    var angle = map(raceCounted[i],0,sumArray,0,360);
-    console.log("Grad:",angle);
+    var angle = map(raceCounted[i], 0, sumArray, 0, 360);
+    console.log("Grad:", angle);
 
     angle = radians(angle);
-    console.log("Bogenmaß:",angle);
+    console.log("Bogenmaß:", angle);
 
   }
+  var angle = radians(90);
+  var angle2 = radians(45);
 
   var radius = 100;
-  var centerX = paperWidth/2;
-  var centerY = paperHeight/2;
+  var centerX = paperWidth / 2;
+  var centerY = paperHeight / 2;
 
-  var startX =  Math.cos(0) * radius + centerX;
-  var startY =  Math.sin(0) * radius + centerY;
+  var startX = Math.cos(0) * radius + centerX;
+  var startY = Math.sin(0) * radius + centerY;
 
   var endX = Math.cos(angle) * radius + centerX;
-  var endY =  Math.sin(angle) * radius + centerY;
+  var endY = Math.sin(angle) * radius + centerY;
 
-  paper.path("M"+startX+"," +startY+ "A" +radius+ ","+radius+ " 0 0 1 "+endX+ ","+endY+"").attr({
-    stroke:"white",
+  var endX2 = Math.cos(angle2) * radius + centerX;
+  var endY2 = Math.sin(angle2) * radius + centerY;
+
+  paper.path("M" + startX + "," + startY + "A" + radius + "," + radius + " 0 0 1 " + endX + "," + endY + "").attr({
+    stroke: "yellow",
+    strokeWidth: 10
+  })
+  paper.path("M" + endX + "," + endY + "A" + radius + "," + radius + " 0 0 1 " + endX2 + "," + endY2 + "").attr({
+    stroke: "green",
     strokeWidth: 10
   })
 
 
 }
 
+function drawFifaViz(array) {
 
-function drawFifaViz() {
-
-  var armingCounted = [20,30,22,17,16];
+  var armingCounted = array;
 
   // empty array to push new position coords for the polygon
   var positions = [];
 
   for (var i = 0; i < armingCounted.length; i++) {
     var size = 5;
-    var angle = (360 / armingCounted.length * i)-90;
+    var angle = (360 / armingCounted.length * i) - 90;
     angle = radians(angle);
 
     //indicator for the visualisation is set on the maximum
     var maxValue = Math.max(...armingCounted);
-    var indicatorX = (paperWidth / 2) + Math.cos(angle) * size * maxValue *1.2;
-    var indicatorY = (paperHeight / 2) + Math.sin(angle) * size * maxValue*1.2;
+    var indicatorX = (paperWidth / 2) + Math.cos(angle) * size * maxValue * 1.2;
+    var indicatorY = (paperHeight / 2) + Math.sin(angle) * size * maxValue * 1.2;
 
     //calculate anchor points on a circle for the polygon
     var xPos = (paperWidth / 2) + Math.cos(angle) * size * armingCounted[i];
     var yPos = (paperHeight / 2) + Math.sin(angle) * size * armingCounted[i];
     // pushes the coords in the positions array
-    positions.push(Math.round(xPos),Math.round(yPos));
+    positions.push(Math.round(xPos), Math.round(yPos));
 
-    paper.ellipse(indicatorX,indicatorY,2,2).attr({
+    paper.ellipse(indicatorX, indicatorY, 2, 2).attr({
       fill: "white"
     });
   }
-  paper.polygon([positions[0],positions[1],
-              positions[2],positions[3],
-              positions[4],positions[5],
-              positions[6],positions[7],
-              positions[8],positions[9]]).attr({
-  fill: "white"
-});
+  paper.polygon([positions[0], positions[1],
+    positions[2], positions[3],
+    positions[4], positions[5],
+    positions[6], positions[7],
+    positions[8], positions[9]
+  ]).attr({
+    fill: "white"
+  });
 }
 
 function victimsPerState() {
+
   for (var i = 0; i < 51; i++) {
 
     var xPos = (i * paperWidth / 51);
-    var yPos = paperHeight / 2;
+    var yPos = (paperHeight - data[i].age) - (paperHeight / 2);
     var age = data[i].age
 
     paper.rect(xPos, yPos, 2, age).attr({
@@ -109,7 +118,10 @@ function victimsPerState() {
     }
     merged.push(newData.state);
   }
-  console.log(mergedData);
+
+  console.log("AK", mergedData.AK.length, "CA", mergedData.CA.length);
+
+
 
 
   // counter but just for array no objects
@@ -121,8 +133,4 @@ function victimsPerState() {
   //   counter[key] = (counter[key] || 0) + 1
   // })
   // console.log(counter);
-}
-
-function deleteCanvas() {
-  paper.selectAll("circle,rect,text").remove();
 }
