@@ -3,15 +3,50 @@ var paper = Snap("#svgContainer");
 var paperWidth = parseInt(document.getElementById("svgContainer").getAttribute("width"));
 var paperHeight = parseInt(document.getElementById("svgContainer").getAttribute("height"));
 
+var cx = paperWidth / 2;
+var cy = paperHeight / 2;
+
 init();
 
 function init() {
+
   var testArray = [20, 30, 10, 15, 25];
   //console.log(data);
   // victimsPerState();
   //drawFifaViz(testArray);
-  drawEthnicity(testArray);
+  //drawEthnicity(testArray);
+  drawEthnicity2(testArray);
+
 }
+
+
+function drawEthnicity2(array) {
+  var raceCounted = array;
+  var angles = [];
+  var radius = 150;
+
+
+  for (var i = 0; i < raceCounted.length; i++) {
+
+    var reducer = (accumulator, currentValue) => accumulator + currentValue;
+    var sumArray = raceCounted.reduce(reducer);
+    console.log(raceCounted[i], "von", sumArray);
+
+    var angle = map(raceCounted[i], 0, sumArray, 0, 360) * 2;
+    console.log("Grad:", angle);
+
+    angles.push(angle);
+  }
+  console.log(angles);
+  var spacing = 3;
+
+  document.getElementById("arc1").setAttribute("d", describeArc(cx, cy, radius, 0, angles[0]));
+  document.getElementById("arc2").setAttribute("d", describeArc(cx, cy, radius, angles[0], angles[0] + angles[1]));
+  document.getElementById("arc3").setAttribute("d", describeArc(cx, cy, radius, angles[1], angles[1] + angles[2]));
+  document.getElementById("arc4").setAttribute("d", describeArc(cx, cy, radius, angles[2], angles[2] + angles[3]));
+  document.getElementById("arc5").setAttribute("d", describeArc(cx, cy, radius, angles[3], angles[3] + angles[4]));
+
+};
 
 function drawEthnicity(array) {
   var raceCounted = array;
@@ -146,4 +181,31 @@ function victimsPerState() {
   //   counter[key] = (counter[key] || 0) + 1
   // })
   // console.log(counter);
+}
+
+
+
+//helper functions
+function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+  var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+
+  return {
+    x: centerX + (radius * Math.cos(angleInRadians)),
+    y: centerY + (radius * Math.sin(angleInRadians))
+  };
+}
+
+function describeArc(x, y, radius, startAngle, endAngle) {
+
+  var start = polarToCartesian(x, y, radius, endAngle);
+  var end = polarToCartesian(x, y, radius, startAngle);
+
+  var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+  var d = [
+    "M", start.x, start.y,
+    "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+  ].join(" ");
+
+  return d;
 }
