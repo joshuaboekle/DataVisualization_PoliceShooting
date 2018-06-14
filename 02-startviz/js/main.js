@@ -8,13 +8,14 @@ init();
 function init() {
   var testArray = [20, 30, 10, 15, 25];
   //console.log(data);
-  //victimsPerState();
-  drawFifaViz(testArray);
-  //drawEthnicity(testArray);
+  // victimsPerState();
+  //drawFifaViz(testArray);
+  drawEthnicity(testArray);
 }
 
 function drawEthnicity(array) {
   var raceCounted = array;
+  var angles = [];
 
   for (var i = 0; i < raceCounted.length; i++) {
 
@@ -25,32 +26,48 @@ function drawEthnicity(array) {
     var angle = map(raceCounted[i], 0, sumArray, 0, 360);
     console.log("Grad:", angle);
 
-    angle = radians(angle);
-    console.log("Bogenmaß:", angle);
+    //angle = radians(angle);
+    //console.log("Bogenmaß:", angle);
 
+    angles.push(angle);
   }
-  var angle = radians(90);
-  var angle2 = radians(45);
+  console.log(angles);
+  var angle1 = 90;
+  var angle2 = 45;
+  var angle3 = 160;
+
+  var radian1 = radians(angle1);
+  var radian2 = radians(angle1 + angle2);
+  var radian3 = radians(angle1 + angle2 + angle3)
 
   var radius = 100;
   var centerX = paperWidth / 2;
   var centerY = paperHeight / 2;
 
-  var startX = Math.cos(0) * radius + centerX;
-  var startY = Math.sin(0) * radius + centerY;
+  var startX = Math.sin(0) * radius + centerX;
+  var startY = -Math.cos(0) * radius + centerY;
 
-  var endX = Math.cos(angle) * radius + centerX;
-  var endY = Math.sin(angle) * radius + centerY;
+  var endX = Math.sin(radian1) * radius + centerX;
+  var endY = -Math.cos(radian1) * radius + centerY;
 
-  var endX2 = Math.cos(angle2) * radius + centerX;
-  var endY2 = Math.sin(angle2) * radius + centerY;
+  var endX2 = Math.sin(radian2) * radius + centerX;
+  var endY2 = -Math.cos(radian2) * radius + centerY;
+
+  var endX3 = Math.sin(radian3) * radius + centerX;
+  var endY3 = -Math.cos(radian3) * radius + centerY;
 
   paper.path("M" + startX + "," + startY + "A" + radius + "," + radius + " 0 0 1 " + endX + "," + endY + "").attr({
     stroke: "yellow",
     strokeWidth: 10
   })
+
   paper.path("M" + endX + "," + endY + "A" + radius + "," + radius + " 0 0 1 " + endX2 + "," + endY2 + "").attr({
     stroke: "green",
+    strokeWidth: 10
+  })
+
+  paper.path("M" + endX2 + "," + endY2 + "A" + radius + "," + radius + " 0 0 1 " + endX3 + "," + endY3 + "").attr({
+    stroke: "pink",
     strokeWidth: 10
   })
 
@@ -84,17 +101,13 @@ function drawFifaViz(array) {
       fill: "white"
     });
   }
-  paper.polygon([positions[0], positions[1],
-    positions[2], positions[3],
-    positions[4], positions[5],
-    positions[6], positions[7],
-    positions[8], positions[9]
-  ]).attr({
+  paper.polygon(positions).attr({
     fill: "white"
   });
 }
 
 function victimsPerState() {
+  console.log(data)
 
   for (var i = 0; i < 51; i++) {
 
@@ -119,7 +132,7 @@ function victimsPerState() {
     merged.push(newData.state);
   }
 
-  console.log("AK", mergedData.AK.length, "CA", mergedData.CA.length);
+  console.log(mergedData, "AK", mergedData.AK.length, "CA", mergedData.CA.length);
 
 
 
