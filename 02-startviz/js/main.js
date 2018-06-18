@@ -9,14 +9,43 @@ var cy = paperHeight / 2;
 init();
 
 function init() {
-  var testArray = [10, 20, 15, 5, 30];
+  var testArray = [];
+  var sortedState = _.groupBy(data, 'state').CA;
+  // console.log(sortedState);
+
+  var armingAttributes = ['neutral', 'dangerous', 'harmful', 'harmless', 'unarmed'];
+
+  for (var i = 0; i < armingAttributes.length; i++) {
+    // console.log(_.groupBy(sortedState, 'arming')[armingAttributes[i]].length, armingAttributes[i]);
+    countedArming = _.groupBy(sortedState, 'arming')[armingAttributes[i]].length
+    testArray.push(countedArming);
+    // console.log(countedArming, testArray);
+  }
+
+
+
+  // var testArray = [10, 20, 15, 5, 30];
 
   //console.log(data);
+  // underscoreTest();
   //victimsPerState();
   // drawFifaViz(testArray);
   // drawEthnicity(testArray);
   drawSmartDonut(testArray);
   //drawEthnicity2(testArray);
+
+}
+
+function underscoreTest() {
+
+  var sortedState = _.groupBy(data, 'state').CA;
+  console.log(sortedState);
+
+  var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'];
+  for (var i = 0; i < armingAttributes.length; i++) {
+    console.log(_.groupBy(sortedState, 'arming')[armingAttributes[i]].length, armingAttributes[i]);
+
+  }
 
 }
 
@@ -204,12 +233,13 @@ function drawFifaViz(array) {
   var positions = [];
 
   for (var i = 0; i < armingCounted.length; i++) {
-    var size = 5;
+    var size = 2;
     var angle = (360 / armingCounted.length * i) - 90;
     angle = radians(angle);
 
     //indicator for the visualisation is set on the maximum
     var maxValue = Math.max(...armingCounted);
+    // var maxValue = 50;
     var indicatorX = (paperWidth / 2) + Math.cos(angle) * size * maxValue * 1.2;
     var indicatorY = (paperHeight / 2) + Math.sin(angle) * size * maxValue * 1.2;
 
@@ -274,7 +304,7 @@ function victimsPerState() {
 
 //helper functions
 function getColor(inputVal) {
-  var func = chroma.scale(["#fff", "#444"]).domain([0, 100]);
+  var func = chroma.scale(["#222", "#fff"]).domain([0, 100]);
   return func(inputVal);
 }
 
