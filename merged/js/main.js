@@ -11,11 +11,7 @@ init();
 function init() {
 
   var testArray = [];
-  var sortedState = _.groupBy(data, 'state').CA;
-  // console.log(sortedState, sortedState.length);
-
-
-  // console.log(_.indexBy(data, 'state'));
+  var sortedState = _.groupBy(data, 'state').FL;
 
   var armingAttributes = ['neutral', 'dangerous', 'harmful', 'harmless', 'unarmed'];
 
@@ -25,21 +21,68 @@ function init() {
     testArray.push(countedArming);
     // console.log(countedArming, testArray);
   }
-
+  // underscoreTest();
   drawBarChart();
-  // drawPolygon(testArray);
+  //drawPolygon(testArray);
   // drawSmartDonut(testArray, cx, cy);
+
 }
 
 function underscoreTest() {
-
-  var sortedState = _.groupBy(data, 'state').CA;
-  console.log(sortedState);
+  var sortedState = _.groupBy(data, 'state')['CA'];
 
   var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'];
   for (var i = 0; i < armingAttributes.length; i++) {
     console.log(_.groupBy(sortedState, 'arming')[armingAttributes[i]].length, armingAttributes[i]);
 
+  }
+
+}
+
+function drawBarChart() {
+  var marginX = 100;
+  var rectArray = [];
+
+
+  // var stateArray = [];
+  // stateArray.push(_.indexBy(data, 'state'));
+  // console.log(_.indexBy(data, 'arming'));
+
+  var stateArray = ['AK', 'AL', 'AR', 'AZ', 'CO', 'CA', 'CT', 'DC', 'DE', 'TX',
+    'FL', 'GA', 'HI', 'IA', 'ID', 'IL', 'KS', 'KY', 'LA', 'MD', 'ME', 'MA', 'MI',
+    'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'OH', 'OR',
+    'PA', 'RI', 'SC', 'SD', 'TN', 'UT', 'VA', 'VT', 'WI', 'WV', 'WY', 'IN', 'WA',
+    'OR', 'DC', 'NY', 'OK'
+  ];
+
+  for (var i = 0; i < stateArray.length; i++) {
+
+    var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
+
+    var xPos = (i * (paperWidth - marginX * 2) / stateArray.length) + marginX;
+    // var yPos = (paperHeight - barSize) - cy;
+    var yPos = paperHeight / 3 * 2 - barSize;
+
+    rectArray.push(paper.rect(xPos, yPos, 8, barSize, 4).attr({
+      fill: 'white'
+    }));
+
+    rectArray[i].click(onClick.bind(null, i));
+  }
+
+  function onClick(index) {
+    console.log(index, rectArray[index]);
+
+    for (var i = 0; i < rectArray.length; i++) {
+      rectArray[i].animate({
+        y: 0,
+        opacity: .6
+      }, 100);
+    }
+
+    rectArray[index].attr({
+      fill: 'yellow',
+    });
   }
 }
 
@@ -115,8 +158,8 @@ function drawPolygon(array) {
     angle = radians(angle);
 
     //indicator for the visualisation is set on the maximum
-    var maxValue = Math.max(...armingCounted);
-    // var maxValue = 50;
+    // var maxValue = Math.max(...armingCounted);
+    var maxValue = 100;
     var indicatorX = (paperWidth / 2) + Math.cos(angle) * size * maxValue * 1.2;
     var indicatorY = (paperHeight / 2) + Math.sin(angle) * size * maxValue * 1.2;
 
@@ -130,35 +173,12 @@ function drawPolygon(array) {
       fill: "white"
     });
   }
+
   paper.polygon(positions).attr({
     fill: "white"
   });
 }
 
-function drawBarChart() {
-  var marginX = 400;
-
-  // var stateArray = [];
-  // stateArray.push(_.indexBy(data, 'state'));
-  // console.log(stateArray);
-
-  var stateArray = ['AK', 'AL', 'AR', 'AZ', 'CO', 'CA', 'TX', 'FL', 'WA', 'OR', 'DC', 'NY'];
-
-
-
-
-  for (var i = 0; i < stateArray.length; i++) {
-
-    var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
-
-    var xPos = (i * (paperWidth - marginX * 2) / stateArray.length) + marginX;
-    var yPos = (paperHeight - barSize) - (paperHeight / 3);
-
-    paper.rect(xPos, yPos, 8, barSize).attr({
-      fill: 'white',
-    });
-  }
-}
 
 //helper functions
 function getColor(inputVal) {

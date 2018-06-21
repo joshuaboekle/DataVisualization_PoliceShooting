@@ -5,6 +5,12 @@ var data = [{
     "state": "WA"
   },
   {
+    "arming": "unarmed",
+    "age": 20,
+    "race": "B",
+    "state": "FL"
+  },
+  {
     "arming": "dangerous",
     "age": 47,
     "race": "W",
