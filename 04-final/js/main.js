@@ -24,29 +24,39 @@ function init() {
 }
 
 function sortEthnicity() {
-
+  // gets the ethnicity data from the selectedState (underscore - groupBy)
   var sortedState = _.groupBy(data, 'state')[selectedState];
+
+  // all available ethnicities in the dataset
   var allEthnicity = ['B', 'W', 'H', 'A', 'O'];
 
   var selectedStateEthnicity = [];
-  var sortedEthnicity = [];
-
 
   for (var i = 0; i < allEthnicity.length; i++) {
-    sortedEthnicity.push(_.groupBy(sortedState, 'race')[allEthnicity[i]].length);
-
     // for schleife für fehlerbehebung da in underscore undefined objects entstehen
     for (var j = 0; j < sortedState.length; j++) {
-      if (sortedState[j].race === allEthnicity[i]) {
 
-        //irgendwas das mir nur die verfügbaren ethnizitäten anzeigt und in ein neues Array speziell für den selectedState packt
-        console.log(selectedState, allEthnicity[i] + ' is available');
+      if (sortedState[j].race.includes(allEthnicity[i]) === true) {
+
+        //pushes all available ethnicities strings into a new Array
         selectedStateEthnicity.push(allEthnicity[i]);
       }
     }
   }
 
-  //console.log(selectedStateEthnicity);
+
+  //clears the duplicates out of the selectedStateEthnicity Array
+  var selectedStateEthnicityCleared = _.uniq(selectedStateEthnicity);
+
+  // the counted persons of each ethnicity is going in here
+  var sortedEthnicity = [];
+
+  for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
+
+    //pusht die Zahlen in das sortedEthicity array, welches an drawSmartDonut weitergegeben wird
+    sortedEthnicity.push(_.groupBy(sortedState, 'race')[selectedStateEthnicityCleared[i]].length);
+  }
+
   drawSmartDonut(sortedEthnicity, px, py)
 }
 
@@ -98,7 +108,8 @@ function drawBarChart() {
     selectedState = stateArray[index];
     for (var i = 0; i < rectArray.length; i++) {
       rectArray[i].animate({
-        opacity: 0.5
+        opacity: 0.7,
+        y: 0
       }, 100);
     }
 
@@ -120,7 +131,7 @@ function drawSmartDonut(array, offsetX, offsetY) {
 
   var raceCounted = array;
 
-  var arcSpacing = radians(3);
+  var arcSpacing = radians(2);
   var radiusVizualization = 150;
   var offsetX;
   var offsetY;
@@ -212,6 +223,7 @@ function drawPolygon(array, offsetX, offsetY) {
 }
 
 //helper functions
+
 function getColor(inputVal) {
   var func = chroma.scale(["#222", "#fff"]).domain([0, 100]);
   return func(inputVal);
