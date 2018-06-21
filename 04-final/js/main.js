@@ -6,7 +6,7 @@ var paperHeight = parseInt(document.getElementById("svgContainer").getAttribute(
 var px = paperWidth / 2;
 var py = paperHeight / 2;
 
-var activeState = undefined;
+var selectedState = undefined;
 
 init();
 
@@ -25,19 +25,28 @@ function init() {
 
 function sortEthnicity() {
 
-  var sortedState = _.groupBy(data, 'state')[activeState];
+  var sortedState = _.groupBy(data, 'state')[selectedState];
   var allEthnicity = ['B', 'W', 'H', 'A', 'O'];
 
+  var selectedStateEthnicity = [];
   var sortedEthnicity = [];
 
-  for (var i = 0; i < allEthnicity.length; i++) {
 
+  for (var i = 0; i < allEthnicity.length; i++) {
     sortedEthnicity.push(_.groupBy(sortedState, 'race')[allEthnicity[i]].length);
 
-    // console.log('general working', _.groupBy(sortedState, 'race')[allEthnicity[i]].length);
-    //console.log(_.groupBy(sortedState, 'race')[allEthnicity[i]].length, allEthnicity[i]);
+    // for schleife für fehlerbehebung da in underscore undefined objects entstehen
+    for (var j = 0; j < sortedState.length; j++) {
+      if (sortedState[j].race === allEthnicity[i]) {
+
+        //irgendwas das mir nur die verfügbaren ethnizitäten anzeigt und in ein neues Array speziell für den selectedState packt
+        console.log(selectedState, allEthnicity[i] + ' is available');
+        selectedStateEthnicity.push(allEthnicity[i]);
+      }
+    }
   }
-  // console.log(sortedEthnicity);
+
+  //console.log(selectedStateEthnicity);
   drawSmartDonut(sortedEthnicity, px, py)
 }
 
@@ -48,7 +57,7 @@ function sortArming() {
   var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'];
   for (var i = 0; i < armingAttributes.length; i++) {
 
-    console.log(activeState, armingAttributes[i], _.groupBy(sortedState, 'arming')[armingAttributes[i]].length);
+    console.log(selectedState, armingAttributes[i], _.groupBy(sortedState, 'arming')[armingAttributes[i]].length);
   }
 }
 
@@ -86,7 +95,7 @@ function drawBarChart() {
   function onClick(index) {
     // console.log(stateArray[index], index, rectArray[index]);
 
-    activeState = stateArray[index];
+    selectedState = stateArray[index];
     for (var i = 0; i < rectArray.length; i++) {
       rectArray[i].animate({
         opacity: 0.5

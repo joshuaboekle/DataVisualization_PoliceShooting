@@ -7,16 +7,63 @@ init();
 
 function init() {
   draw();
+
+  var testArray = [{
+      "arming": "dangerous",
+      "age": 53,
+      "race": "A",
+      "state": "WA"
+    },
+    {
+      "arming": "unarmed",
+      "age": 20,
+      "race": "B",
+      "state": "FL"
+    },
+    {
+      "arming": "dangerous",
+      "age": 47,
+      "race": "W",
+      "state": "OR"
+    },
+    {
+      "arming": "unarmed",
+      "age": 23,
+      "race": "H",
+      "state": "KS"
+    },
+    {
+      "arming": "harmless",
+      "age": 32,
+      "race": "W",
+      "state": "CA"
+    }
+  ];
+
+  var groupBy = function(xs, key) {
+    return xs.reduce(function(rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  };
+  console.log(groupBy(testArray, 'length'));
 }
 
 function draw() {
   // drawFifaViz();
-  underscoreTest();
+  // groupByTest();
 }
 
-function underscoreTest() {
-
+function groupByTest() {
+  console.log(groupBy(['one', 'two', 'three'], 'length'));
 }
+
+var groupBy = function(xs, key) {
+  return xs.reduce(function(rv, x) {
+    (rv[x[key]] = rv[x[key]] || []).push(x);
+    return rv;
+  }, {});
+};
 
 function drawFifaViz() {
 
