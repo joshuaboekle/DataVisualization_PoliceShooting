@@ -3,40 +3,53 @@ var paper = Snap("#svgContainer");
 var paperWidth = parseInt(document.getElementById("svgContainer").getAttribute("width"));
 var paperHeight = parseInt(document.getElementById("svgContainer").getAttribute("height"));
 
-var cx = paperWidth / 2;
-var cy = paperHeight / 2;
+var px = paperWidth / 2;
+var py = paperHeight / 2;
+
+var activeState = undefined;
 
 init();
 
 function init() {
 
-  var testArray = [];
-  var sortedState = _.groupBy(data, 'state').FL;
-
-  var armingAttributes = ['neutral', 'dangerous', 'harmful', 'harmless', 'unarmed'];
-
-  for (var i = 0; i < armingAttributes.length; i++) {
-    // console.log(_.groupBy(sortedState, 'arming')[armingAttributes[i]].length, armingAttributes[i]);
-    countedArming = _.groupBy(sortedState, 'arming')[armingAttributes[i]].length
-    testArray.push(countedArming);
-    // console.log(countedArming, testArray);
-  }
-  // underscoreTest();
   drawBarChart();
-  //drawPolygon(testArray);
-  // drawSmartDonut(testArray, cx, cy);
+
+  // sortEthnicity();
+  // sortArming();
+
+  var testArray = [40, 30, 1, 3, 6];
+  // drawPolygon(testArray, px, py);
+  // drawSmartDonut(testArray, px, py);
 
 }
 
-function underscoreTest() {
+function sortEthnicity() {
+
+  var sortedState = _.groupBy(data, 'state')[activeState];
+  var allEthnicity = ['B', 'W', 'H', 'A', 'O'];
+
+  var sortedEthnicity = [];
+
+  for (var i = 0; i < allEthnicity.length; i++) {
+
+    sortedEthnicity.push(_.groupBy(sortedState, 'race')[allEthnicity[i]].length);
+
+    // console.log('general working', _.groupBy(sortedState, 'race')[allEthnicity[i]].length);
+    //console.log(_.groupBy(sortedState, 'race')[allEthnicity[i]].length, allEthnicity[i]);
+  }
+  // console.log(sortedEthnicity);
+  drawSmartDonut(sortedEthnicity, px, py)
+}
+
+function sortArming() {
+
   var sortedState = _.groupBy(data, 'state')['CA'];
 
   var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'];
   for (var i = 0; i < armingAttributes.length; i++) {
-    console.log(_.groupBy(sortedState, 'arming')[armingAttributes[i]].length, armingAttributes[i]);
 
+    console.log(activeState, armingAttributes[i], _.groupBy(sortedState, 'arming')[armingAttributes[i]].length);
   }
-
 }
 
 function drawBarChart() {
@@ -60,7 +73,7 @@ function drawBarChart() {
     var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
 
     var xPos = (i * (paperWidth - marginX * 2) / stateArray.length) + marginX;
-    // var yPos = (paperHeight - barSize) - cy;
+    // var yPos = (paperHeight - barSize) - py;
     var yPos = paperHeight / 3 * 2 - barSize;
 
     rectArray.push(paper.rect(xPos, yPos, 8, barSize, 4).attr({
@@ -69,20 +82,28 @@ function drawBarChart() {
 
     rectArray[i].click(onClick.bind(null, i));
   }
-
+  // triggers new draw and delivers data
   function onClick(index) {
-    console.log(index, rectArray[index]);
+    // console.log(stateArray[index], index, rectArray[index]);
 
+    activeState = stateArray[index];
     for (var i = 0; i < rectArray.length; i++) {
       rectArray[i].animate({
-        y: 0,
-        opacity: .6
+        opacity: 0.5
       }, 100);
     }
 
     rectArray[index].attr({
       fill: 'yellow',
     });
+
+    sortEthnicity();
+
+    // event listener und dispatch anschauen
+    // dispatchEvent('coolerName', {
+    //   data: sfhshgf
+    // })
+
   }
 }
 
@@ -145,7 +166,9 @@ function drawSmartDonut(array, offsetX, offsetY) {
   }
 }
 
-function drawPolygon(array) {
+function drawPolygon(array, offsetX, offsetY) {
+  var offsetX;
+  var offsetY;
 
   var armingCounted = array;
 
@@ -160,12 +183,12 @@ function drawPolygon(array) {
     //indicator for the visualisation is set on the maximum
     // var maxValue = Math.max(...armingCounted);
     var maxValue = 100;
-    var indicatorX = (paperWidth / 2) + Math.cos(angle) * size * maxValue * 1.2;
-    var indicatorY = (paperHeight / 2) + Math.sin(angle) * size * maxValue * 1.2;
+    var indicatorX = offsetX + Math.cos(angle) * size * maxValue * 1.2;
+    var indicatorY = offsetY + Math.sin(angle) * size * maxValue * 1.2;
 
     //calculate anchor points on a circle for the polygon
-    var xPos = (paperWidth / 2) + Math.cos(angle) * size * armingCounted[i];
-    var yPos = (paperHeight / 2) + Math.sin(angle) * size * armingCounted[i];
+    var xPos = offsetX + Math.cos(angle) * size * armingCounted[i];
+    var yPos = offsetY + Math.sin(angle) * size * armingCounted[i];
     // pushes the coords in the positions array
     positions.push(Math.round(xPos), Math.round(yPos));
 
@@ -178,7 +201,6 @@ function drawPolygon(array) {
     fill: "white"
   });
 }
-
 
 //helper functions
 function getColor(inputVal) {
