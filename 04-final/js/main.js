@@ -24,6 +24,7 @@ function init() {
 }
 
 function sortEthnicity() {
+
   // gets the ethnicity data from the selectedState (underscore - groupBy)
   var sortedState = _.groupBy(data, 'state')[selectedState];
 
@@ -90,33 +91,33 @@ function drawBarChart() {
   for (var i = 0; i < stateArray.length; i++) {
 
     var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
-
+    var newBarSize = map(barSize, 0, 150, 20, 200)
     var xPos = (i * (paperWidth - marginX * 2) / stateArray.length) + marginX;
     // var yPos = (paperHeight - barSize) - py;
-    var yPos = paperHeight / 3 * 2 - barSize;
+    var yPos = paperHeight / 3 * 2 - newBarSize;
 
-    rectArray.push(paper.rect(xPos, yPos, 8, barSize, 4).attr({
-      fill: 'white'
+    rectArray.push(paper.rect(xPos, yPos, 8, newBarSize, 4).attr({
+      fill: '#000025'
     }));
 
     rectArray[i].click(onClick.bind(null, i));
   }
   // triggers new draw and delivers data
   function onClick(index) {
-    // console.log(stateArray[index], index, rectArray[index]);
 
     selectedState = stateArray[index];
     for (var i = 0; i < rectArray.length; i++) {
       rectArray[i].animate({
-        opacity: 0.7,
         y: 0
-      }, 100);
+      }, 200);
     }
 
     rectArray[index].attr({
-      fill: 'yellow',
-    });
+      fill: '#00417E',
+      opacity: .8,
 
+    });
+    paper.selectAll("path").remove();
     sortEthnicity();
 
     // event listener und dispatch anschauen
@@ -131,7 +132,7 @@ function drawSmartDonut(array, offsetX, offsetY) {
 
   var raceCounted = array;
 
-  var arcSpacing = radians(2);
+  var arcSpacing = radians(1.5);
   var radiusVizualization = 150;
   var offsetX;
   var offsetY;
@@ -161,6 +162,8 @@ function drawSmartDonut(array, offsetX, offsetY) {
     currentPosition += radiants[i];
   }
 
+  var arcArray = [];
+
   for (var i = 0; i < radiants.length; i++) {
     for (var j = 0; j < positions[i].length; j++) {
       var radianArcStart = positions[i][0];
@@ -177,12 +180,14 @@ function drawSmartDonut(array, offsetX, offsetY) {
       var endX = Math.sin(radianArcEnd) * radiusVizualization + offsetX;
       var endY = -Math.cos(radianArcEnd) * radiusVizualization + offsetY;
 
-      paper.path("M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
+
+      arcArray.push(paper.path("M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
         stroke: getColor(i * 20),
-        strokeWidth: 10,
-        fill: "none"
-      })
+        strokeWidth: 15,
+        fill: 'none'
+      }));
     }
+
   }
 }
 
@@ -225,6 +230,6 @@ function drawPolygon(array, offsetX, offsetY) {
 //helper functions
 
 function getColor(inputVal) {
-  var func = chroma.scale(["#222", "#fff"]).domain([0, 100]);
+  var func = chroma.scale(["#E54652", "#81272E"]).domain([0, 70]);
   return func(inputVal);
 }
