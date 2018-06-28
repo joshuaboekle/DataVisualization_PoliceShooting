@@ -1,7 +1,9 @@
 var paper = Snap("#svgContainer");
 
-var paperWidth = parseInt(document.getElementById("svgContainer").getAttribute("width"));
-var paperHeight = parseInt(document.getElementById("svgContainer").getAttribute("height"));
+var paperWidth = window.innerWidth;
+//parseInt(document.getElementById("svgContainer").getAttribute("width"));
+var paperHeight = window.innerHeight;
+//parseInt(document.getElementById("svgContainer").getAttribute("height"));
 
 var px = paperWidth / 2;
 var py = paperHeight / 2;
@@ -25,12 +27,13 @@ var allEthnicity = ['W', 'B', 'H', 'A', 'O'];
 var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'];
 
 
+var clicked = 99999;
+
 init();
 
 function init() {
 
   drawBarChart();
-
 }
 
 
@@ -38,14 +41,13 @@ function init() {
 
 
 function drawBarChart() {
-  var marginX = 150;
+  var marginX = 400;
   var rectArray = [];
-
-
 
   for (var i = 0; i < stateArray.length; i++) {
 
     var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
+    console.log(_.groupBy(data, 'state')[stateArray[i]].length);
     var newBarSize = map(barSize, 0, 150, 10, 170);
     var xPos = (i * (paperWidth - marginX * 2) / stateArray.length) + marginX;
     // var yPos = (paperHeight - barSize) - py;
@@ -57,22 +59,12 @@ function drawBarChart() {
     }));
 
     rectArray[i].click(onClick.bind(null, i));
-    rectArray[i].hover(onHover.bind(null, i));
+    rectArray[i].mouseover(onHover.bind(null, i));
+    rectArray[i].mouseout(onMouseOut.bind(null, i));
+
 
   }
 
-  function onHover(index) {
-    for (var i = 0; i < rectArray.length; i++) {
-      rectArray[i].animate({
-        opacity: .4
-      }, 200);
-    }
-
-    rectArray[index].animate({
-      opacity: 1,
-    }, 200);
-
-  }
   // triggers new draw and delivers data
   function onClick(index) {
 
@@ -86,7 +78,7 @@ function drawBarChart() {
         opacity: .4,
         y: 0
         // y: paperHeight - 50 - newBarSize
-      }, 300);
+      }, 300, mina.easeinout);
     }
 
     rectArray[index].animate({
@@ -99,11 +91,39 @@ function drawBarChart() {
 
     sortEthnicity();
 
-    // event listener und dispatch anschauen
-    // dispatchEvent('coolerName', {
-    //   data: sfhshgf
-    // })
+    clicked = index;
+    console.log("clicked" + clicked);
 
+  }
+
+  function onMouseOut(index) {
+
+    for (var i = 0; i < rectArray.length; i++) {
+      if (i !== clicked) {
+        // rectArray[i].animate({
+        //   opacity: .4
+        // }, 200);
+        rectArray[i].animate({
+          opacity: .4,
+        }, 200);
+      } else {
+        rectArray[i].animate({
+          opacity: 1
+        }, 200);
+      }
+    }
+  }
+
+  function onHover(index) {
+    for (var i = 0; i < rectArray.length; i++) {
+      rectArray[i].animate({
+        opacity: .4
+      }, 200);
+    }
+
+    rectArray[index].animate({
+      opacity: 1,
+    }, 200);
   }
 }
 
@@ -111,8 +131,6 @@ function sortEthnicity() {
 
   // gets the ethnicity data from the selectedState (underscore - groupBy)
   var sortedState = _.groupBy(data, 'state')[selectedState];
-
-
 
   var selectedStateEthnicity = [];
 
@@ -141,7 +159,7 @@ function sortEthnicity() {
     sortedEthnicity.push(_.groupBy(sortedState, 'race')[selectedStateEthnicityCleared[i]].length);
   }
 
-  drawSmartDonut(sortedEthnicity, px, py)
+  drawSmartDonut(sortedEthnicity, px, py);
 }
 
 function drawSmartDonut(array, offsetX, offsetY) {
@@ -213,14 +231,19 @@ function drawSmartDonut(array, offsetX, offsetY) {
 
       console.log('selectedEthnicityInState', selectedEthnicityInState);
 
-      paper.selectAll("ellipse,polygon,polyline,rect").remove();
+      paper.selectAll("ellipse,polygon,polyline").remove();
+      paper.selectAll("rect").animate({
+        opacity: 0
+      }, 200);
+
+
 
       for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
         arcArray[i].animate({
+          transform: "t-500,0",
           opacity: .6,
           strokeWidth: 12
-          // d: "M" + startX + "," + startY + "A" + radiusVizualization + 30 + "," + radiusVizualization + 30 + " 0 " + above180 + " 1 " + endX + "," + endY + ""
-
+          //  d: "M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + ""
         }, 200);
       }
 
@@ -274,6 +297,7 @@ function sortArming() {
 
 function drawPolyline(array, offsetX, offsetY) {
   // var array = [3, 5, 10, 0, 3];
+
   var offsetX;
   var offsetY;
 
