@@ -8,6 +8,8 @@ var py = paperHeight / 2;
 
 var selectedState = undefined;
 
+var selectedStateEthnicityCleared;
+
 init();
 
 function init() {
@@ -17,60 +19,11 @@ function init() {
   // sortEthnicity();
   // sortArming();
 
-  var testArray = [40, 30, 1, 3, 6];
-  // drawPolygon(testArray, px, py);
-  // drawSmartDonut(testArray, px, py);
-
 }
 
-function sortEthnicity() {
-
-  // gets the ethnicity data from the selectedState (underscore - groupBy)
-  var sortedState = _.groupBy(data, 'state')[selectedState];
-
-  // all available ethnicities in the dataset
-  var allEthnicity = ['B', 'W', 'H', 'A', 'O'];
-
-  var selectedStateEthnicity = [];
-
-  for (var i = 0; i < allEthnicity.length; i++) {
-    // for schleife für fehlerbehebung da in underscore undefined objects entstehen
-    for (var j = 0; j < sortedState.length; j++) {
-
-      if (sortedState[j].race.includes(allEthnicity[i]) === true) {
-
-        //pushes all available ethnicities strings into a new Array
-        selectedStateEthnicity.push(allEthnicity[i]);
-      }
-    }
-  }
 
 
-  //clears the duplicates out of the selectedStateEthnicity Array
-  var selectedStateEthnicityCleared = _.uniq(selectedStateEthnicity);
 
-  // the counted persons of each ethnicity is going in here
-  var sortedEthnicity = [];
-
-  for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
-
-    //pusht die Zahlen in das sortedEthicity array, welches an drawSmartDonut weitergegeben wird
-    sortedEthnicity.push(_.groupBy(sortedState, 'race')[selectedStateEthnicityCleared[i]].length);
-  }
-
-  drawSmartDonut(sortedEthnicity, px, py)
-}
-
-function sortArming() {
-
-  var sortedState = _.groupBy(data, 'state')['CA'];
-
-  var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'];
-  for (var i = 0; i < armingAttributes.length; i++) {
-
-    console.log(selectedState, armingAttributes[i], _.groupBy(sortedState, 'arming')[armingAttributes[i]].length);
-  }
-}
 
 function drawBarChart() {
   var marginX = 100;
@@ -102,6 +55,7 @@ function drawBarChart() {
 
     rectArray[i].click(onClick.bind(null, i));
   }
+
   // triggers new draw and delivers data
   function onClick(index) {
 
@@ -118,6 +72,7 @@ function drawBarChart() {
 
     });
     paper.selectAll("path").remove();
+
     sortEthnicity();
 
     // event listener und dispatch anschauen
@@ -126,6 +81,45 @@ function drawBarChart() {
     // })
 
   }
+}
+
+
+function sortEthnicity() {
+
+  // gets the ethnicity data from the selectedState (underscore - groupBy)
+  var sortedState = _.groupBy(data, 'state')[selectedState];
+
+  // all available ethnicities in the dataset
+  var allEthnicity = ['B', 'W', 'H', 'A', 'O'];
+
+  var selectedStateEthnicity = [];
+
+  for (var i = 0; i < allEthnicity.length; i++) {
+    // for schleife für fehlerbehebung da in underscore undefined objects entstehen
+    for (var j = 0; j < sortedState.length; j++) {
+
+      if (sortedState[j].race.includes(allEthnicity[i]) === true) {
+
+        //pushes all available ethnicities strings into a new Array
+        selectedStateEthnicity.push(allEthnicity[i]);
+      }
+    }
+  }
+
+
+  //clears the duplicates out of the selectedStateEthnicity Array
+  selectedStateEthnicityCleared = _.uniq(selectedStateEthnicity);
+
+  // the counted persons of each ethnicity is going in here
+  var sortedEthnicity = [];
+
+  for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
+
+    //pusht die Zahlen in das sortedEthicity array, welches an drawSmartDonut weitergegeben wird
+    sortedEthnicity.push(_.groupBy(sortedState, 'race')[selectedStateEthnicityCleared[i]].length);
+  }
+
+  drawSmartDonut(sortedEthnicity, px, py)
 }
 
 function drawSmartDonut(array, offsetX, offsetY) {
@@ -173,21 +167,49 @@ function drawSmartDonut(array, offsetX, offsetY) {
       if (radiants[i] > radians(180)) {
         above180 = 1;
       }
-
-      var startX = Math.sin(radianArcStart + arcSpacing) * radiusVizualization + offsetX;
-      var startY = -Math.cos(radianArcStart + arcSpacing) * radiusVizualization + offsetY;
-
-      var endX = Math.sin(radianArcEnd) * radiusVizualization + offsetX;
-      var endY = -Math.cos(radianArcEnd) * radiusVizualization + offsetY;
-
-
-      arcArray.push(paper.path("M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
-        stroke: getColor(i * 20),
-        strokeWidth: 15,
-        fill: 'none'
-      }));
     }
 
+    var startX = Math.sin(radianArcStart + arcSpacing) * radiusVizualization + offsetX;
+    var startY = -Math.cos(radianArcStart + arcSpacing) * radiusVizualization + offsetY;
+
+    var endX = Math.sin(radianArcEnd) * radiusVizualization + offsetX;
+    var endY = -Math.cos(radianArcEnd) * radiusVizualization + offsetY;
+
+    arcArray.push(paper.path("M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
+      stroke: getColor(i * 20),
+      strokeWidth: 15,
+      fill: 'none'
+    }));
+
+    console.log(arcArray[i]);
+
+    arcArray[i].click(onClick.bind(null, i));
+
+    function onClick(index) {
+      console.log('working', 'clicked index :', i);
+
+      // var ethnicityInState = selectedStateEthnicityCleared[index];
+
+      // arcArray[index].attr({
+      //   stroke: '#00417E',
+      //   opacity: .8,
+      //
+      // });
+
+      sortEthnicity();
+
+    }
+  }
+}
+
+function sortArming() {
+
+  var sortedState = _.groupBy(data, 'state')['CA'];
+
+  var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'];
+  for (var i = 0; i < armingAttributes.length; i++) {
+
+    console.log(selectedState, armingAttributes[i], _.groupBy(sortedState, 'arming')[armingAttributes[i]].length);
   }
 }
 
