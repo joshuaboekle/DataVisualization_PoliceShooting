@@ -16,7 +16,7 @@ init();
 function init() {
 
   drawBarChart();
-
+  // drawPolyline();
   // sortEthnicity();
   // sortArming();
 
@@ -27,13 +27,8 @@ function init() {
 
 
 function drawBarChart() {
-  var marginX = 100;
+  var marginX = 150;
   var rectArray = [];
-
-
-  // var stateArray = [];
-  // stateArray.push(_.indexBy(data, 'state'));
-  // console.log(_.indexBy(data, 'arming'));
 
   var stateArray = ['AK', 'AL', 'AR', 'AZ', 'CO', 'CA', 'CT', 'DC', 'DE', 'TX',
     'FL', 'GA', 'HI', 'IA', 'ID', 'IL', 'KS', 'KY', 'LA', 'MD', 'ME', 'MA', 'MI',
@@ -85,7 +80,6 @@ function drawBarChart() {
 
   }
 }
-
 
 function sortEthnicity() {
 
@@ -194,7 +188,7 @@ function drawSmartDonut(array, offsetX, offsetY) {
 
       console.log('selectedEthnicityInState', selectedEthnicityInState);
 
-      paper.selectAll("ellipse,polygon").remove();
+      paper.selectAll("ellipse,polygon,polyline").remove();
 
       for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
         arcArray[i].animate({
@@ -234,7 +228,6 @@ function sortArming() {
     }
   }
 
-
   //clears the duplicates out of the selectedStateEthnicity Array
   selectedArmingCleared = _.uniq(selectedArming);
 
@@ -248,7 +241,8 @@ function sortArming() {
   }
 
   console.log(countedArming);
-  drawPolygon(countedArming, px, py)
+  // drawPolygon(countedArming, px, py)
+  drawPolyline(countedArming);
 
 }
 
@@ -285,6 +279,43 @@ function drawPolygon(array, offsetX, offsetY) {
 
   paper.polygon(positions).attr({
     fill: "white"
+  });
+}
+
+function drawPolyline(array, offsetX, offsetY) {
+  // var testArray = [3, 5, 10, 0, 3];
+  var testArray = array;
+
+  var offsetX;
+  var offsetY;
+
+  var positions = [];
+  var sizeIndicators = 2;
+
+  var armingCounted = testArray;
+
+  for (var i = 0; i < 5; i++) {
+    var indicatorX = px;
+    var indicatorY = py + i * 50;
+
+    var xPos = indicatorX + (armingCounted[i] * 5);
+    var yPos = indicatorY;
+
+    paper.ellipse(indicatorX, indicatorY, sizeIndicators, sizeIndicators).attr({
+      fill: 'white',
+      opacity: .3
+    });
+
+    positions.push(xPos, yPos);
+
+  }
+  var g = paper.gradient("l(0, 0, 1, 1)#000-#f00-#fff");
+  paper.polyline(positions).attr({
+    stroke: 'white',
+    strokeWidth: 3,
+    fill: 'none',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round'
   });
 }
 
