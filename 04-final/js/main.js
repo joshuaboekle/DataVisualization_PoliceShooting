@@ -40,31 +40,51 @@ function drawBarChart() {
   for (var i = 0; i < stateArray.length; i++) {
 
     var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
-    var newBarSize = map(barSize, 0, 150, 10, 170)
+    var newBarSize = map(barSize, 0, 150, 10, 170);
     var xPos = (i * (paperWidth - marginX * 2) / stateArray.length) + marginX;
     // var yPos = (paperHeight - barSize) - py;
     var yPos = paperHeight / 3 * 2 - newBarSize;
 
-    rectArray.push(paper.rect(xPos, yPos, 7, newBarSize, 3.5).attr({
-      fill: 'white'
+    rectArray.push(paper.rect(xPos, yPos, 6, newBarSize, 3).attr({
+      fill: 'white',
+      opacity: .4
     }));
 
     rectArray[i].click(onClick.bind(null, i));
+    rectArray[i].hover(onHover.bind(null, i));
+
   }
 
-  // triggers new draw and delivers data
-  function onClick(index) {
-
-    selectedState = stateArray[index];
+  function onHover(index) {
     for (var i = 0; i < rectArray.length; i++) {
       rectArray[i].animate({
-        opacity: .6,
-        y: 0
+        opacity: .4
       }, 200);
     }
 
     rectArray[index].animate({
       opacity: 1,
+    }, 200);
+
+  }
+  // triggers new draw and delivers data
+  function onClick(index) {
+
+    selectedState = stateArray[index];
+    for (var i = 0; i < rectArray.length; i++) {
+
+      var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
+      var newBarSize = map(barSize, 0, 150, 10, 170);
+
+      rectArray[i].animate({
+        opacity: .4,
+        y: 0
+        // y: paperHeight - 50 - newBarSize
+      }, 300);
+    }
+
+    rectArray[index].animate({
+      opacity: .8,
     }, 200);
 
     paper.selectAll("path,polygon,ellipse").remove();
@@ -174,8 +194,8 @@ function drawSmartDonut(array, offsetX, offsetY) {
     arcArray.push(paper.path("M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
       stroke: getColor(i * 20),
       // stroke: 'white',
-      strokeWidth: 8,
-      opacity: .6,
+      strokeWidth: 12,
+      opacity: .8,
       fill: 'none'
     }));
 
@@ -188,12 +208,14 @@ function drawSmartDonut(array, offsetX, offsetY) {
 
       console.log('selectedEthnicityInState', selectedEthnicityInState);
 
-      paper.selectAll("ellipse,polygon,polyline").remove();
+      paper.selectAll("ellipse,polygon,polyline,rect").remove();
 
       for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
         arcArray[i].animate({
           opacity: .6,
-          strokeWidth: 8
+          strokeWidth: 12
+          // d: "M" + startX + "," + startY + "A" + radiusVizualization + 30 + "," + radiusVizualization + 30 + " 0 " + above180 + " 1 " + endX + "," + endY + ""
+
         }, 200);
       }
 
@@ -242,44 +264,8 @@ function sortArming() {
 
   console.log(countedArming);
   // drawPolygon(countedArming, px, py)
-  drawPolyline(countedArming);
+  drawPolyline(countedArming, 200, -130);
 
-}
-
-function drawPolygon(array, offsetX, offsetY) {
-  var offsetX;
-  var offsetY;
-
-  var armingCounted = array;
-
-  // empty array to push new position coords for the polygon
-  var positions = [];
-
-  for (var i = 0; i < armingCounted.length; i++) {
-    var size = 2;
-    var angle = (360 / armingCounted.length * i) - 90;
-    angle = radians(angle);
-
-    //indicator for the visualisation is set on the maximum
-    // var maxValue = Math.max(...armingCounted);
-    var maxValue = 100;
-    var indicatorX = offsetX + Math.cos(angle) * size * maxValue * 1.2;
-    var indicatorY = offsetY + Math.sin(angle) * size * maxValue * 1.2;
-
-    //calculate anchor points on a circle for the polygon
-    var xPos = offsetX + Math.cos(angle) * size * armingCounted[i];
-    var yPos = offsetY + Math.sin(angle) * size * armingCounted[i];
-    // pushes the coords in the positions array
-    positions.push(Math.round(xPos), Math.round(yPos));
-
-    paper.ellipse(indicatorX, indicatorY, 2, 2).attr({
-      fill: "white"
-    });
-  }
-
-  paper.polygon(positions).attr({
-    fill: "white"
-  });
 }
 
 function drawPolyline(array, offsetX, offsetY) {
@@ -295,8 +281,8 @@ function drawPolyline(array, offsetX, offsetY) {
   var armingCounted = testArray;
 
   for (var i = 0; i < 5; i++) {
-    var indicatorX = px;
-    var indicatorY = py + i * 50;
+    var indicatorX = px + offsetX;
+    var indicatorY = (py + i * 70) + offsetY;
 
     var xPos = indicatorX + (armingCounted[i] * 5);
     var yPos = indicatorY;
@@ -318,6 +304,42 @@ function drawPolyline(array, offsetX, offsetY) {
     strokeLinejoin: 'round'
   });
 }
+
+// function drawPolygon(array, offsetX, offsetY) {
+//   var offsetX;
+//   var offsetY;
+//
+//   var armingCounted = array;
+//
+//   // empty array to push new position coords for the polygon
+//   var positions = [];
+//
+//   for (var i = 0; i < armingCounted.length; i++) {
+//     var size = 2;
+//     var angle = (360 / armingCounted.length * i) - 90;
+//     angle = radians(angle);
+//
+//     //indicator for the visualisation is set on the maximum
+//     // var maxValue = Math.max(...armingCounted);
+//     var maxValue = 100;
+//     var indicatorX = offsetX + Math.cos(angle) * size * maxValue * 1.2;
+//     var indicatorY = offsetY + Math.sin(angle) * size * maxValue * 1.2;
+//
+//     //calculate anchor points on a circle for the polygon
+//     var xPos = offsetX + Math.cos(angle) * size * armingCounted[i];
+//     var yPos = offsetY + Math.sin(angle) * size * armingCounted[i];
+//     // pushes the coords in the positions array
+//     positions.push(Math.round(xPos), Math.round(yPos));
+//
+//     paper.ellipse(indicatorX, indicatorY, 2, 2).attr({
+//       fill: "white"
+//     });
+//   }
+//
+//   paper.polygon(positions).attr({
+//     fill: "white"
+//   });
+// }
 
 //helper functions
 
