@@ -11,14 +11,25 @@ var selectedState = undefined;
 var selectedStateEthnicityCleared;
 var selectedEthnicityInState;
 
+var stateArray = ['AK', 'AL', 'AR', 'AZ', 'CO', 'CA', 'CT', 'DC', 'DE', 'TX',
+  'FL', 'GA', 'HI', 'IA', 'ID', 'IL', 'KS', 'KY', 'LA', 'MD', 'ME', 'MA', 'MI',
+  'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'OH', 'OR',
+  'PA', 'RI', 'SC', 'SD', 'TN', 'UT', 'VA', 'VT', 'WI', 'WV', 'WY', 'IN', 'WA',
+  'OR', 'DC', 'NY', 'OK'
+];
+
+// all available ethnicities in the dataset
+var allEthnicity = ['W', 'B', 'H', 'A', 'O'];
+// all available armings grades in the dataset
+
+var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'];
+
+
 init();
 
 function init() {
 
   drawBarChart();
-  // drawPolyline();
-  // sortEthnicity();
-  // sortArming();
 
 }
 
@@ -30,12 +41,7 @@ function drawBarChart() {
   var marginX = 150;
   var rectArray = [];
 
-  var stateArray = ['AK', 'AL', 'AR', 'AZ', 'CO', 'CA', 'CT', 'DC', 'DE', 'TX',
-    'FL', 'GA', 'HI', 'IA', 'ID', 'IL', 'KS', 'KY', 'LA', 'MD', 'ME', 'MA', 'MI',
-    'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'OH', 'OR',
-    'PA', 'RI', 'SC', 'SD', 'TN', 'UT', 'VA', 'VT', 'WI', 'WV', 'WY', 'IN', 'WA',
-    'OR', 'DC', 'NY', 'OK'
-  ];
+
 
   for (var i = 0; i < stateArray.length; i++) {
 
@@ -106,8 +112,7 @@ function sortEthnicity() {
   // gets the ethnicity data from the selectedState (underscore - groupBy)
   var sortedState = _.groupBy(data, 'state')[selectedState];
 
-  // all available ethnicities in the dataset
-  var allEthnicity = ['H', 'B', 'W', 'A', 'O'];
+
 
   var selectedStateEthnicity = [];
 
@@ -231,7 +236,6 @@ function drawSmartDonut(array, offsetX, offsetY) {
 }
 
 function sortArming() {
-  var armingAttributes = ['neutral', 'dangerous', 'harmful', 'harmless', 'unarmed'];
 
   var sortedState = _.groupBy(data, 'state')[selectedState];
   var sortedEthnicityInState = _.groupBy(sortedState, 'race')[selectedEthnicityInState];
@@ -262,23 +266,28 @@ function sortArming() {
     countedArming.push(_.groupBy(sortedEthnicityInState, 'arming')[selectedArmingCleared[i]].length);
   }
 
-  console.log(countedArming);
+  // console.log(countedArming);
   // drawPolygon(countedArming, px, py)
   drawPolyline(countedArming, 200, -130);
 
 }
 
 function drawPolyline(array, offsetX, offsetY) {
-  // var testArray = [3, 5, 10, 0, 3];
-  var testArray = array;
-
+  // var array = [3, 5, 10, 0, 3];
   var offsetX;
   var offsetY;
 
   var positions = [];
   var sizeIndicators = 2;
 
-  var armingCounted = testArray;
+  var armingCounted = array;
+  console.log("oldArming", armingCounted);
+  if (armingCounted.length < 5) {
+    console.log("arming Counted smaller than 5!!!", "Length of array: ", armingCounted.length);
+    armingCounted.push(0, 0, 0, 0, 0);
+    console.log("newArming", armingCounted);
+
+  }
 
   for (var i = 0; i < 5; i++) {
     var indicatorX = px + offsetX;
