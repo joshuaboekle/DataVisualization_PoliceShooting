@@ -1,12 +1,12 @@
 body, html {
-  background-color: #EDE8DF;
-  color: white;
+  background-color: #000C15;
+  color: grey;
   font-family: 'Open Sans', sans-serif;
   overflow: hidden;
 }
 
 svg {
-  background-color: #EDE8DF;
+  background-color: #000C15;
 }
 
 button {
