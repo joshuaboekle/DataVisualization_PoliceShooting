@@ -69,8 +69,8 @@ function drawBarChart() {
     rectArray[index].attr({
       fill: '#00417E',
       opacity: .8,
-
     });
+
     paper.selectAll("path").remove();
 
     sortEthnicity();
@@ -177,24 +177,24 @@ function drawSmartDonut(array, offsetX, offsetY) {
 
     arcArray.push(paper.path("M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
       stroke: getColor(i * 20),
-      strokeWidth: 15,
+      strokeWidth: 10,
       fill: 'none'
     }));
-
-    console.log(arcArray[i]);
 
     arcArray[i].click(onClick.bind(null, i));
 
     function onClick(index) {
-      console.log('working', 'clicked index :', i);
+      console.log('working', 'clicked index :', index, arcArray[index]);
 
       // var ethnicityInState = selectedStateEthnicityCleared[index];
+      // paper.selectAll("path").remove();
 
-      // arcArray[index].attr({
-      //   stroke: '#00417E',
-      //   opacity: .8,
-      //
-      // });
+      arcArray[index].animate({
+        strokeWidth: 20,
+        stroke: 'green',
+        opacity: 1
+      }, 200);
+
 
       sortEthnicity();
 
