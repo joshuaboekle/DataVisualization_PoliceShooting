@@ -6,8 +6,9 @@ var paperHeight = window.innerHeight;
 // variables vor the center of the window
 var px = paperWidth / 2;
 var py = paperHeight / 2;
+
 // after click the Smartdonut Viz tranforms with transformX
-var transformX = paperWidth/12;
+var transformX = paperWidth / 12;
 
 // determine and updates the selected state
 var selectedState = undefined;
@@ -30,12 +31,20 @@ var allEthnicity = ['W', 'B', 'H', 'A', 'O'];
 // all available armings grades in the dataset
 var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'];
 
+
+///////STYLE
+
+var opacityUnselected = 0.35;
+var opacitySelected = 1;
+
+
+
 // used colors in the document
-var color1= "#f6f6f6";
+var color1 = "#f6f6f6";
 // var gradient = chroma.scale(['#e51d1d','#861fe0'])
 //     .mode('lch').colors(5);
 
-var gradient=chroma.scale(['#cc24be', '#2ab1e2']).colors(5);
+var gradient = chroma.scale(['#cc24be', '#2ab1e2']).colors(5);
 
 
 
@@ -47,13 +56,13 @@ init();
 function init() {
   drawBarChart();
 
-  console.log(chroma.scale(['#fafa6e','#2A4858'])
+  console.log(chroma.scale(['#fafa6e', '#2A4858'])
     .mode('lch').colors(6));
 }
 
 // draws data layer 01 and a bar chart vizualization
 function drawBarChart() {
-  var marginX = paperWidth/6;
+  var marginX = paperWidth / 6;
   //empty array where the drawn bars getting pushed later
   var rectArray = [];
 
@@ -65,7 +74,7 @@ function drawBarChart() {
 
     // count the states with the underscore.js lib and looks at array length to get barSize
     var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
-    var barWidth = paperWidth*0.00333333;
+    var barWidth = paperWidth * 0.00333333;
     // maps the barSize that small values getting better visible
     var mappedBarSize = map(barSize, 0, 150, 10, 170);
 
@@ -75,10 +84,10 @@ function drawBarChart() {
 
     //creates a rectangle with position and barSize
     //also pushes it into the rectArray so it's accessible later
-    rectArray.push(paper.rect(xPos, yPos, barWidth, mappedBarSize, barWidth/2).animate({
+    rectArray.push(paper.rect(xPos, yPos, barWidth, mappedBarSize, barWidth / 2).animate({
       fill: color1,
-      opacity: .4
-    },1000));
+      opacity: opacityUnselected
+    }, 1000));
 
     //event handling if a rect is clicked, hovered or not is changing the style of the bars
     rectArray[i].click(onClick.bind(null, i));
@@ -103,20 +112,20 @@ function drawBarChart() {
       // if clicked is i the bar gets highlighted as it is the selected element
       if (i !== clicked) {
         rectArray[i].animate({
-          opacity: .4,
-          y: paperHeight - 30 - mappedBarSize
+          opacity: opacityUnselected,
+          y: paperHeight - 10 - mappedBarSize
         }, 200, mina.easeinout);
       } else {
         rectArray[i].animate({
-          opacity: 1,
-          y: paperHeight - 30 - mappedBarSize,
+          opacity: opacitySelected,
+          y: paperHeight - 10 - mappedBarSize,
         }, 600, mina.easeinout);
       }
     }
 
     //removes other svg elements at the screen
     paper.selectAll("path,polyline,ellipse").remove();
-
+    //onClick start draw layer02
     sortEthnicity();
   }
 
@@ -125,11 +134,11 @@ function drawBarChart() {
     for (var i = 0; i < rectArray.length; i++) {
       if (i !== clicked) {
         rectArray[i].animate({
-          opacity: .4,
+          opacity: opacityUnselected,
         }, 200, mina.easeinout);
       } else {
         rectArray[i].animate({
-          opacity: 1,
+          opacity: opacitySelected,
         }, 200, mina.easeinout);
       }
     }
@@ -138,20 +147,20 @@ function drawBarChart() {
   function onHover(index) {
     for (var i = 0; i < rectArray.length; i++) {
 
-      if (i !== clicked ) {
+      if (i !== clicked) {
         rectArray[i].animate({
-          opacity: .4,
+          opacity: opacityUnselected,
         }, 200, mina.easeinout);
       } else {
         rectArray[i].animate({
-          opacity: 1,
+          opacity: opacitySelected,
         }, 200, mina.easeinout);
       }
     }
     // the rect where the hover is triggered is also drawn in higher opacity
     rectArray[index].animate({
-      opacity:.8
-    },200)
+      opacity: opacitySelected
+    }, 200)
   }
 }
 
@@ -164,9 +173,9 @@ function sortEthnicity() {
   var selectedStateEthnicity = [];
 
   for (var i = 0; i < allEthnicity.length; i++) {
-    // for schleife für fehlerbehebung da in underscore undefined objects entstehen
+    // if in groupBy is a ethnicity not available it gives you undefined
+    // this is a work around to create a new array with the available ethnicities in a state
     for (var j = 0; j < sortedState.length; j++) {
-
       if (sortedState[j].race.includes(allEthnicity[i]) === true) {
 
         //pushes all available ethnicities strings into a new Array
@@ -184,26 +193,33 @@ function sortEthnicity() {
 
   for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
 
-    //pusht die Zahlen in das sortedEthicity array, welches an drawSmartDonut weitergegeben wird
+    //pusht the counted values into a new array and gives it to drawSmartDonut
     sortedEthnicity.push(_.groupBy(sortedState, 'race')[selectedStateEthnicityCleared[i]].length);
   }
-
+  // function to draw the second vizualization
   drawSmartDonut(sortedEthnicity, px, py);
 }
 
 function drawSmartDonut(array, offsetX, offsetY) {
   var raceCounted = array;
+  var strokeSize = paperWidth / 100;
+
+  // for element selection and eventhandling
+  var clicked;
 
   var arcSpacing = radians(1.5);
-  var radiusVizualization = 150;
+  var radiusVizualization = paperWidth / 8;
   var offsetX;
   var offsetY;
 
+  //empty array where the calculated radiants getting pushed
   var radiants = [];
 
+  //get the sum of the whole array so it can be mapped to 360 degree
   var reducer = (accumulator, currentValue) => accumulator + currentValue;
   var sumArray = raceCounted.reduce(reducer);
 
+  //calculates the radiants of every element in the raceCounted array and pushes it into the empty radiants array
   for (var i = 0; i < raceCounted.length; i++) {
     var angle = map(raceCounted[i], 0, sumArray, 0, 360);
     rad = radians(angle);
@@ -211,9 +227,11 @@ function drawSmartDonut(array, offsetX, offsetY) {
     radiants.push(rad);
   }
 
+  //empty array whre the calculated positions getting pushed
   var positions = [];
-  var currentPosition = 0; // for the following loop
 
+  //loop to create an array with [[start,end],[start,end]]
+  var currentPosition = 0; // for the following loop
   for (var i = 0; i < radiants.length; i++) {
     positions.push([]);
     var start = currentPosition;
@@ -223,42 +241,46 @@ function drawSmartDonut(array, offsetX, offsetY) {
     positions[i].push(end);
     currentPosition += radiants[i];
   }
-
+  //array where the paper.path getting pushed
   var arcArray = [];
+
 
   for (var i = 0; i < radiants.length; i++) {
     for (var j = 0; j < positions[i].length; j++) {
       var radianArcStart = positions[i][0];
       var radianArcEnd = positions[i][1];
-
+      //if the radiant is above 180 a the sweep-flag in the svg path need to be 1 if not 0
       var above180 = 0;
       if (radiants[i] > radians(180)) {
         above180 = 1;
       }
     }
-
+    // calculate start point
     var startX = Math.sin(radianArcStart + arcSpacing) * radiusVizualization + offsetX;
     var startY = -Math.cos(radianArcStart + arcSpacing) * radiusVizualization + offsetY;
 
+    // calculate end point
     var endX = Math.sin(radianArcEnd) * radiusVizualization + offsetX;
     var endY = -Math.cos(radianArcEnd) * radiusVizualization + offsetY;
 
+    // draws a arc type svg path and getting pushed into the array
     arcArray.push(paper.path("M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
       stroke: gradient[i],
       // stroke: 'white',
-      strokeWidth: 12,
-      opacity: .8,
+      strokeWidth: strokeSize,
+      opacity: .6,
       fill: 'none'
     }));
 
+
+    // eventhandler for arcs
     arcArray[i].click(onClick.bind(null, i));
+    arcArray[i].mouseover(onHover.bind(null, i));
+    arcArray[i].mouseout(onMouseOut.bind(null, i));
 
     function onClick(index) {
-
-      // console.log('working', 'clicked index :', index, arcArray[index]);
+      clicked = index;
       selectedEthnicityInState = selectedStateEthnicityCleared[index];
-
-      console.log('selectedEthnicityInState', selectedEthnicityInState);
 
       paper.selectAll("ellipse,polygon,polyline").remove();
       paper.selectAll("rect").animate({
@@ -268,22 +290,57 @@ function drawSmartDonut(array, offsetX, offsetY) {
 
       for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
         arcArray[i].animate({
-          transform: "t-"+ transformX +",0",
+          transform: "t-" + transformX + ",0",
           opacity: .6,
-          strokeWidth: 12
-          //  d: "M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + ""
-        }, 200);
+          strokeWidth: strokeSize
+        }, 200, mina.easeinout);
       }
 
+
       arcArray[index].animate({
-        strokeWidth: 16,
+        strokeWidth: strokeSize * 1.3,
         opacity: 1
       }, 200);
 
-      sortArming();
 
+      sortArming();
+    }
+
+    function onMouseOut(index) {
+      //the if else behaves the same as in onClick but for the mouseOut
+      for (var i = 0; i < arcArray.length; i++) {
+        if (i !== clicked) {
+          arcArray[i].animate({
+            opacity: .6
+          }, 200);
+        } else {
+          arcArray[i].animate({
+            opacity: 1
+          }, 200);
+        }
+      }
+    }
+
+    function onHover(index) {
+      for (var i = 0; i < arcArray.length; i++) {
+
+        if (i !== clicked) {
+          arcArray[i].animate({
+            opacity: .6,
+          }, 200, mina.easeinout);
+        } else {
+          arcArray[i].animate({
+            opacity: 1,
+          }, 200, mina.easeinout);
+        }
+      }
+      // the rect where the hover is triggered is also drawn in higher opacity
+      arcArray[index].animate({
+        opacity: 1
+      }, 200)
     }
   }
+
 }
 
 
