@@ -1,18 +1,21 @@
 var paper = Snap("#svgContainer");
-
+// get the window width and height of the browser, the sizing is not hard coded
 var paperWidth = window.innerWidth;
-//parseInt(document.getElementById("svgContainer").getAttribute("width"));
 var paperHeight = window.innerHeight;
-//parseInt(document.getElementById("svgContainer").getAttribute("height"));
 
+// variables vor the center of the window
 var px = paperWidth / 2;
 var py = paperHeight / 2;
+// after click the Smartdonut Viz tranforms with transformX
+var transformX = paperWidth/12;
 
+// determine and updates the selected state
 var selectedState = undefined;
 
 var selectedStateEthnicityCleared;
 var selectedEthnicityInState;
 
+// all available states in the dataset
 var stateArray = ['AK', 'AL', 'AR', 'AZ', 'CO', 'CA', 'CT', 'DC', 'DE', 'TX',
   'FL', 'GA', 'HI', 'IA', 'ID', 'IL', 'KS', 'KY', 'LA', 'MD', 'ME', 'MA', 'MI',
   'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'OH', 'OR',
@@ -22,110 +25,129 @@ var stateArray = ['AK', 'AL', 'AR', 'AZ', 'CO', 'CA', 'CT', 'DC', 'DE', 'TX',
 
 // all available ethnicities in the dataset
 var allEthnicity = ['W', 'B', 'H', 'A', 'O'];
-// all available armings grades in the dataset
 
+// all available armings grades in the dataset
 var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'];
 
+// used colors in the document
+var color1= "#f6f6f6";
 
-var clicked = 99999;
+
+
+
 
 init();
 
+// first function that loads
 function init() {
-
   drawBarChart();
 }
 
-
-
-
-
+// draws data layer 01 and a bar chart vizualization
 function drawBarChart() {
-  var marginX = 400;
+  var marginX = paperWidth/6;
+  //empty array where the drawn bars getting pushed later
   var rectArray = [];
 
+  // for element selection and eventhandling
+  var clicked;
+
+  //loops through the stateArray to draw 51 bars
   for (var i = 0; i < stateArray.length; i++) {
 
+    // count the states with the underscore.js lib and looks at array length to get barSize
     var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
-    console.log(_.groupBy(data, 'state')[stateArray[i]].length);
-    var newBarSize = map(barSize, 0, 150, 10, 170);
+    var barWidth = paperWidth*0.00333333;
+    // maps the barSize that small values getting better visible
+    var mappedBarSize = map(barSize, 0, 150, 10, 170);
+
+    // calculates the xPos and yPos of every bar
     var xPos = (i * (paperWidth - marginX * 2) / stateArray.length) + marginX;
-    // var yPos = (paperHeight - barSize) - py;
-    var yPos = paperHeight / 3 * 2 - newBarSize;
+    var yPos = paperHeight / 3 * 2 - mappedBarSize;
 
-    rectArray.push(paper.rect(xPos, yPos, 6, newBarSize, 3).attr({
-      fill: 'white',
+    //creates a rectangle with position and barSize
+    //also pushes it into the rectArray so it's accessible later
+    rectArray.push(paper.rect(xPos, yPos, barWidth, mappedBarSize, barWidth/2).animate({
+      fill: color1,
       opacity: .4
-    }));
+    },1000));
 
+    //event handling if a rect is clicked, hovered or not is changing the style of the bars
     rectArray[i].click(onClick.bind(null, i));
     rectArray[i].mouseover(onHover.bind(null, i));
     rectArray[i].mouseout(onMouseOut.bind(null, i));
-
 
   }
 
   // triggers new draw and delivers data
   function onClick(index) {
-
+    //the stateCode for the clicked state is saved
     selectedState = stateArray[index];
-    for (var i = 0; i < rectArray.length; i++) {
-
-      var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
-      var newBarSize = map(barSize, 0, 150, 10, 170);
-
-      rectArray[i].animate({
-        opacity: .4,
-        y: 0
-        // y: paperHeight - 50 - newBarSize
-      }, 300, mina.easeinout);
-    }
-
-    rectArray[index].animate({
-      opacity: .8,
-    }, 200);
-
-    paper.selectAll("path,polygon,ellipse").remove();
-
-    console.log('selectedState', selectedState);
-
-    sortEthnicity();
-
+    //clicked is getting the index to find and animate the clicked rectangle
     clicked = index;
     console.log("clicked" + clicked);
 
+    //same for loop when the bars was drawn the first time
+    for (var i = 0; i < rectArray.length; i++) {
+      var barSize = _.groupBy(data, 'state')[stateArray[i]].length;
+      var mappedBarSize = map(barSize, 0, 150, 10, 170);
+      // if clicked is not i then it would animate the unclicked bars
+      // if clicked is i the bar gets highlighted as it is the selected element
+      if (i !== clicked) {
+        rectArray[i].animate({
+          opacity: .4,
+          y: paperHeight - 30 - mappedBarSize
+        }, 200, mina.easeinout);
+      } else {
+        rectArray[i].animate({
+          opacity: 1,
+          y: paperHeight - 30 - mappedBarSize,
+        }, 600, mina.easeinout);
+      }
+    }
+
+    //removes other svg elements at the screen
+    paper.selectAll("path,polyline,ellipse").remove();
+
+    sortEthnicity();
   }
 
   function onMouseOut(index) {
-
     for (var i = 0; i < rectArray.length; i++) {
       if (i !== clicked) {
-        // rectArray[i].animate({
-        //   opacity: .4
-        // }, 200);
         rectArray[i].animate({
           opacity: .4,
-        }, 200);
+        }, 200, mina.easeinout);
       } else {
         rectArray[i].animate({
-          opacity: 1
-        }, 200);
+          opacity: 1,
+        }, 200, mina.easeinout);
       }
     }
   }
 
   function onHover(index) {
+    hover = index;
+    console.log(index);
     for (var i = 0; i < rectArray.length; i++) {
-      rectArray[i].animate({
-        opacity: .4
-      }, 200);
+
+      if (i !== clicked ) {
+        rectArray[i].animate({
+          opacity: .4,
+        }, 200, mina.easeinout);
+      } else {
+        rectArray[i].animate({
+          opacity: 1,
+        }, 200, mina.easeinout);
+      }
     }
 
     rectArray[index].animate({
-      opacity: 1,
-    }, 200);
+      opacity:.8
+    },200)
   }
 }
+
 
 function sortEthnicity() {
 
@@ -237,10 +259,10 @@ function drawSmartDonut(array, offsetX, offsetY) {
       }, 200);
 
 
-
       for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
+
         arcArray[i].animate({
-          transform: "t-500,0",
+          transform: "t-"+ transformX +",0",
           opacity: .6,
           strokeWidth: 12
           //  d: "M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + ""
@@ -257,6 +279,7 @@ function drawSmartDonut(array, offsetX, offsetY) {
     }
   }
 }
+
 
 function sortArming() {
 
@@ -338,45 +361,45 @@ function drawPolyline(array, offsetX, offsetY) {
   });
 }
 
-// function drawPolygon(array, offsetX, offsetY) {
-//   var offsetX;
-//   var offsetY;
-//
-//   var armingCounted = array;
-//
-//   // empty array to push new position coords for the polygon
-//   var positions = [];
-//
-//   for (var i = 0; i < armingCounted.length; i++) {
-//     var size = 2;
-//     var angle = (360 / armingCounted.length * i) - 90;
-//     angle = radians(angle);
-//
-//     //indicator for the visualisation is set on the maximum
-//     // var maxValue = Math.max(...armingCounted);
-//     var maxValue = 100;
-//     var indicatorX = offsetX + Math.cos(angle) * size * maxValue * 1.2;
-//     var indicatorY = offsetY + Math.sin(angle) * size * maxValue * 1.2;
-//
-//     //calculate anchor points on a circle for the polygon
-//     var xPos = offsetX + Math.cos(angle) * size * armingCounted[i];
-//     var yPos = offsetY + Math.sin(angle) * size * armingCounted[i];
-//     // pushes the coords in the positions array
-//     positions.push(Math.round(xPos), Math.round(yPos));
-//
-//     paper.ellipse(indicatorX, indicatorY, 2, 2).attr({
-//       fill: "white"
-//     });
-//   }
-//
-//   paper.polygon(positions).attr({
-//     fill: "white"
-//   });
-// }
+function drawPolygon(array, offsetX, offsetY) {
+  var offsetX;
+  var offsetY;
+
+  var armingCounted = array;
+
+  // empty array to push new position coords for the polygon
+  var positions = [];
+
+  for (var i = 0; i < armingCounted.length; i++) {
+    var size = 2;
+    var angle = (360 / armingCounted.length * i) - 90;
+    angle = radians(angle);
+
+    //indicator for the visualisation is set on the maximum
+    // var maxValue = Math.max(...armingCounted);
+    var maxValue = 100;
+    var indicatorX = offsetX + Math.cos(angle) * size * maxValue * 1.2;
+    var indicatorY = offsetY + Math.sin(angle) * size * maxValue * 1.2;
+
+    //calculate anchor points on a circle for the polygon
+    var xPos = offsetX + Math.cos(angle) * size * armingCounted[i];
+    var yPos = offsetY + Math.sin(angle) * size * armingCounted[i];
+    // pushes the coords in the positions array
+    positions.push(Math.round(xPos), Math.round(yPos));
+
+    paper.ellipse(indicatorX, indicatorY, 2, 2).attr({
+      fill: "white"
+    });
+  }
+
+  paper.polygon(positions).attr({
+    fill: "white"
+  });
+}
 
 //helper functions
 
 function getColor(inputVal) {
-  var func = chroma.scale(["#9B30DB", "#A22020"]).domain([0, 60]);
+  var func = chroma.scale(["#9B30DB", "#A22020"]).domain([0, 70]);
   return func(inputVal);
 }
