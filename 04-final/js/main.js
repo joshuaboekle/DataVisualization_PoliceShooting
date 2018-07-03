@@ -12,6 +12,7 @@ var transformX = paperWidth/12;
 // determine and updates the selected state
 var selectedState = undefined;
 
+// array where the sorted datas from sortEthnicity and
 var selectedStateEthnicityCleared;
 var selectedEthnicityInState;
 
@@ -31,6 +32,10 @@ var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'
 
 // used colors in the document
 var color1= "#f6f6f6";
+// var gradient = chroma.scale(['#e51d1d','#861fe0'])
+//     .mode('lch').colors(5);
+
+var gradient=chroma.scale(['#cc24be', '#2ab1e2']).colors(5);
 
 
 
@@ -41,6 +46,9 @@ init();
 // first function that loads
 function init() {
   drawBarChart();
+
+  console.log(chroma.scale(['#fafa6e','#2A4858'])
+    .mode('lch').colors(6));
 }
 
 // draws data layer 01 and a bar chart vizualization
@@ -113,6 +121,7 @@ function drawBarChart() {
   }
 
   function onMouseOut(index) {
+    //the if else behaves the same as in onClick but for the mouseOut
     for (var i = 0; i < rectArray.length; i++) {
       if (i !== clicked) {
         rectArray[i].animate({
@@ -127,8 +136,6 @@ function drawBarChart() {
   }
 
   function onHover(index) {
-    hover = index;
-    console.log(index);
     for (var i = 0; i < rectArray.length; i++) {
 
       if (i !== clicked ) {
@@ -141,14 +148,14 @@ function drawBarChart() {
         }, 200, mina.easeinout);
       }
     }
-
+    // the rect where the hover is triggered is also drawn in higher opacity
     rectArray[index].animate({
       opacity:.8
     },200)
   }
 }
 
-
+// sorts the data from layer 01 and gives it to layer 02 (drawSmartDonut)
 function sortEthnicity() {
 
   // gets the ethnicity data from the selectedState (underscore - groupBy)
@@ -237,7 +244,7 @@ function drawSmartDonut(array, offsetX, offsetY) {
     var endY = -Math.cos(radianArcEnd) * radiusVizualization + offsetY;
 
     arcArray.push(paper.path("M" + startX + "," + startY + "A" + radiusVizualization + "," + radiusVizualization + " 0 " + above180 + " 1 " + endX + "," + endY + "").attr({
-      stroke: getColor(i * 20),
+      stroke: gradient[i],
       // stroke: 'white',
       strokeWidth: 12,
       opacity: .8,
@@ -260,7 +267,6 @@ function drawSmartDonut(array, offsetX, offsetY) {
 
 
       for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
-
         arcArray[i].animate({
           transform: "t-"+ transformX +",0",
           opacity: .6,
@@ -328,11 +334,9 @@ function drawPolyline(array, offsetX, offsetY) {
   var sizeIndicators = 2;
 
   var armingCounted = array;
-  console.log("oldArming", armingCounted);
   if (armingCounted.length < 5) {
-    console.log("arming Counted smaller than 5!!!", "Length of array: ", armingCounted.length);
+
     armingCounted.push(0, 0, 0, 0, 0);
-    console.log("newArming", armingCounted);
 
   }
 
@@ -351,9 +355,9 @@ function drawPolyline(array, offsetX, offsetY) {
     positions.push(xPos, yPos);
 
   }
-  var g = paper.gradient("l(0, 0, 1, 1)#000-#f00-#fff");
+  var g = paper.gradient("L(0, 0, 1, 1)#0b823e-#d82237");
   paper.polyline(positions).attr({
-    stroke: 'white',
+    stroke: g,
     strokeWidth: 3,
     fill: 'none',
     strokeLinecap: 'round',
@@ -400,6 +404,6 @@ function drawPolygon(array, offsetX, offsetY) {
 //helper functions
 
 function getColor(inputVal) {
-  var func = chroma.scale(["#9B30DB", "#A22020"]).domain([0, 70]);
+  var func = chroma.scale(['yellow', '008ae5']).domain([20, 85]).mode('lch');
   return func(inputVal);
 }
