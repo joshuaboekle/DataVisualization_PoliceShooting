@@ -113,12 +113,12 @@ function drawBarChart() {
       if (i !== clicked) {
         rectArray[i].animate({
           opacity: opacityUnselected,
-          y: paperHeight - 10 - mappedBarSize
+          y: paperHeight - 25 - mappedBarSize
         }, 200, mina.easeinout);
       } else {
         rectArray[i].animate({
           opacity: opacitySelected,
-          y: paperHeight - 10 - mappedBarSize,
+          y: paperHeight - 25 - mappedBarSize,
         }, 600, mina.easeinout);
       }
     }
@@ -244,7 +244,6 @@ function drawSmartDonut(array, offsetX, offsetY) {
   //array where the paper.path getting pushed
   var arcArray = [];
 
-
   for (var i = 0; i < radiants.length; i++) {
     for (var j = 0; j < positions[i].length; j++) {
       var radianArcStart = positions[i][0];
@@ -287,7 +286,6 @@ function drawSmartDonut(array, offsetX, offsetY) {
         opacity: 0
       }, 200);
 
-
       for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
         arcArray[i].animate({
           transform: "t-" + transformX + ",0",
@@ -296,12 +294,10 @@ function drawSmartDonut(array, offsetX, offsetY) {
         }, 200, mina.easeinout);
       }
 
-
       arcArray[index].animate({
-        strokeWidth: strokeSize * 1.3,
+        strokeWidth: strokeSize * 1.35,
         opacity: 1
       }, 200);
-
 
       sortArming();
     }
