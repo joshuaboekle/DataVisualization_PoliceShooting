@@ -51,9 +51,6 @@ init();
 // first function that loads
 function init() {
   drawBarChart();
-
-  console.log(chroma.scale(['#fafa6e', '#2A4858'])
-    .mode('lch').colors(6));
 }
 
 // draws data layer 01 and a bar chart vizualization
@@ -98,7 +95,6 @@ function drawBarChart() {
     selectedState = stateArray[index];
     //clicked is getting the index to find and animate the clicked rectangle
     clicked = index;
-    console.log("clicked" + clicked);
 
     //same for loop when the bars was drawn the first time
     for (var i = 0; i < rectArray.length; i++) {
@@ -281,7 +277,7 @@ function drawSmartDonut(array, offsetX, offsetY) {
       paper.selectAll("rect").animate({
         opacity: 0
       }, 200);
-
+      // transform the visualization to left if ethnicity is clicked
       for (var i = 0; i < selectedStateEthnicityCleared.length; i++) {
         arcArray[i].animate({
           transform: "t-" + transformX + ",0",
@@ -294,7 +290,7 @@ function drawSmartDonut(array, offsetX, offsetY) {
         strokeWidth: strokeSize * 1.35,
         opacity: 1
       }, 200);
-
+      //clicked ethnicity and sort the arming
       sortArming();
     }
 
@@ -344,31 +340,30 @@ function sortArming() {
   var selectedArming = [];
 
   for (var i = 0; i < armingAttributes.length; i++) {
-    // for schleife für fehlerbehebung da in underscore undefined objects entstehen
+    // if in groupBy is a ethnicity not available it gives you undefined
+    // this is a work around to create a new array with the available ethnicities in a state
     for (var j = 0; j < sortedEthnicityInState.length; j++) {
 
       if (sortedEthnicityInState[j].arming.includes(armingAttributes[i]) === true) {
 
-        //pushes all available ethnicities strings into a new Array
+        //pushes all available arming strings into a new Array
         selectedArming.push(armingAttributes[i]);
       }
     }
   }
 
-  //clears the duplicates out of the selectedStateEthnicity Array
+  //clears the duplicates out of the selectedArmingCleared Array
   selectedArmingCleared = _.uniq(selectedArming);
 
-  // the counted persons of each ethnicity is going in here
+  // the counted persons of each arming is going in here
   var countedArming = [];
 
   for (var i = 0; i < selectedArmingCleared.length; i++) {
 
-    //pusht die Zahlen in das sortedEthicity array, welches an drawSmartDonut weitergegeben wird
+    //push the _.groupBy Values into counted arming
     countedArming.push(_.groupBy(sortedEthnicityInState, 'arming')[selectedArmingCleared[i]].length);
   }
-
-  // console.log(countedArming);
-  // drawPolygon(countedArming, px, py)
+  // draw layer03 with the countedArming
   drawPolyline(countedArming, (paperWidth / 10), -130);
 
 }
@@ -381,16 +376,18 @@ function drawPolyline(array, offsetX, offsetY) {
   var positions = [];
   var sizeIndicators = 2;
 
+
   var armingCounted = array;
+
+  // if array is not at 5 values push 0,0,0
   if (armingCounted.length < 5) {
-
     armingCounted.push(0, 0, 0, 0, 0);
-
   }
 
+  // draw the polyline
   for (var i = 0; i < 5; i++) {
     var indicatorX = px + offsetX;
-    var indicatorY = (py + i * 70) + offsetY;
+    var indicatorY = (py + i * 60) + offsetY;
 
     var xPos = indicatorX + (armingCounted[i] * 5);
     var yPos = indicatorY;
@@ -447,11 +444,4 @@ function drawPolygon(array, offsetX, offsetY) {
   paper.polygon(positions).attr({
     fill: "white"
   });
-}
-
-//helper functions
-
-function getColor(inputVal) {
-  var func = chroma.scale(['yellow', '008ae5']).domain([20, 85]).mode('lch');
-  return func(inputVal);
 }
