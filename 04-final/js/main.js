@@ -19,10 +19,10 @@ var selectedEthnicityInState;
 
 // all available states in the dataset
 var stateArray = ['AK', 'AL', 'AR', 'AZ', 'CO', 'CA', 'CT', 'DC', 'DE', 'TX',
-  'FL', 'GA', 'HI', 'IA', 'ID', 'IL', 'KS', 'KY', 'LA', 'MD', 'ME', 'MA', 'MI',
+  'FL', 'GA', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MD', 'ME', 'MA', 'MI',
   'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'OH', 'OR',
-  'PA', 'RI', 'SC', 'SD', 'TN', 'UT', 'VA', 'VT', 'WI', 'WV', 'WY', 'IN', 'WA',
-  'OR', 'DC', 'NY', 'OK'
+  'PA', 'RI', 'SC', 'SD', 'TN', 'UT', 'VA', 'VT', 'WI', 'WV', 'WY', 'WA',
+  'OK', 'OR', 'NY',
 ];
 
 // all available ethnicities in the dataset
@@ -37,14 +37,10 @@ var armingAttributes = ['dangerous', 'harmful', 'neutral', 'harmless', 'unarmed'
 var opacityUnselected = 0.35;
 var opacitySelected = 1;
 
-
-
 // used colors in the document
-var color1 = "#f6f6f6";
-// var gradient = chroma.scale(['#e51d1d','#861fe0'])
-//     .mode('lch').colors(5);
+var color1 = "#DAE0DF";
 
-var gradient = chroma.scale(['#cc24be', '#2ab1e2']).colors(5);
+var gradient = chroma.scale(['#861595', '#245FB5']).colors(5);
 
 
 
@@ -373,12 +369,11 @@ function sortArming() {
 
   // console.log(countedArming);
   // drawPolygon(countedArming, px, py)
-  drawPolyline(countedArming, 200, -130);
+  drawPolyline(countedArming, (paperWidth / 10), -130);
 
 }
 
 function drawPolyline(array, offsetX, offsetY) {
-  // var array = [3, 5, 10, 0, 3];
 
   var offsetX;
   var offsetY;
@@ -401,17 +396,17 @@ function drawPolyline(array, offsetX, offsetY) {
     var yPos = indicatorY;
 
     paper.ellipse(indicatorX, indicatorY, sizeIndicators, sizeIndicators).attr({
-      fill: 'white',
+      fill: color1,
       opacity: .3
     });
 
     positions.push(xPos, yPos);
 
   }
-  var g = paper.gradient("L(0, 0, 1, 1)#0b823e-#d82237");
   paper.polyline(positions).attr({
-    stroke: g,
-    strokeWidth: 3,
+    stroke: color1,
+    strokeWidth: 2,
+
     fill: 'none',
     strokeLinecap: 'round',
     strokeLinejoin: 'round'
