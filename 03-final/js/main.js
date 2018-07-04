@@ -42,10 +42,6 @@ var color1 = "#DAE0DF";
 
 var gradient = chroma.scale(['#861595', '#245FB5']).colors(5);
 
-
-
-
-
 init();
 
 // first function that loads
